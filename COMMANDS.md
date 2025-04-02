@@ -81,8 +81,29 @@ These define how your job runs.
 
 ---
 
-## 🔁 Sync Code with Databricks Repo
-- make sync
+## 🔁 Repo Syncing
+
+| Command | Description |
+|---------|-------------|
+| `make sync` | Pull the latest changes into your Databricks Repos directory. Use this after pushing to GitHub. |
+
+---
+
+## ✅ Pipelines (Local & Remote)
+
+| Command | Description |
+|---------|-------------|
+| `make run-pipeline PIPELINE=default_pipeline` | Run a full pipeline locally (e.g., `ingest_customer` → `transform_orders`). |
+| `make deploy-pipeline` | Deploy the full multi-task pipeline job to Databricks (e.g., from `jobs/default_pipeline_job.json`). |
+| `make run-pipeline-remote JOB_ID=<job_id>` | Execute a remote pipeline run using the specified job ID. |
+
+---
+
+## 🧼 Cleanup
+
+| Command | Description |
+|---------|-------------|
+| `make clean-remote JOB_ID=<job_id>` | Deletes a job from Databricks to clean up stale or unused jobs. |
 
 ## 🏁 What's Next
 
