@@ -1,12 +1,17 @@
 import os
-import shutil
 import pytest
 from pyspark.sql import SparkSession
 from jobs.transform_orders import run
 
+
 @pytest.fixture(scope="module")
 def spark():
-    return SparkSession.builder.master("local[2]").appName("TestTransformOrders").getOrCreate()
+    return (
+        SparkSession.builder.master("local[2]")
+        .appName("TestTransformOrders")
+        .getOrCreate()
+    )
+
 
 def test_transform_orders_run(spark):
     # Setup test file
