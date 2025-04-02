@@ -1,4 +1,5 @@
 from utils.io import load_csv_to_df, write_df_as_table
+from utils.config import get_output_table
 from utils.config import get_input_path
 import shutil
 import os
@@ -15,4 +16,4 @@ def run(spark, **kwargs):
     df = load_csv_to_df(spark, input_path)
     df.show()
 
-    df.write.mode("overwrite").saveAsTable("customers_cleaned")
+    df.write.mode("overwrite").saveAsTable(get_output_table("customers_cleaned"))

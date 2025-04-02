@@ -1,0 +1,14 @@
+{
+    "name": "Ingest Customer Job",
+    "new_cluster": {
+      "spark_version": "15.4.x-scala2.12",
+      "node_type_id": "m5d.large",
+      "num_workers": 1
+    },
+    "spark_python_task": {
+      "python_file": "dbfs:/Users/timpomaville663@gmail.com/databricks_toolkit/databricks_toolkit.zip",
+      "parameters": ["jobs/ingest_customer.py"]
+    },
+    "timeout_seconds": 3600,
+    "max_retries": 1
+  }
