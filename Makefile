@@ -2,34 +2,35 @@
 
 run:
 	@echo "Running job: $(JOB)"
-	source $(VENV_ACTIVATE) && python local_runner.py --job=$(JOB)
+	. $(VENV_ACTIVATE) && python local_runner.py --job=$(JOB)
 
 VENV_ACTIVATE=.venv/bin/activate
 
-.PHONY: help test run-ingest
+.PHONY: help test run-ingest run-pipeline lint format deploy-ingest run-ingest-remote sync
 
 help:
 	@echo "Available targets:"
 	@echo "  make test         Run all tests"
 	@echo "  make run-ingest   Run the ingest_customer job locally"
+	@echo "  make sync         Pull latest changes from GitHub into Databricks Repos"
 
 test:
 	@echo "Running tests..."
-	PYTHONPATH=. source $(VENV_ACTIVATE) && pytest tests
+	PYTHONPATH=. . $(VENV_ACTIVATE) && pytest tests
 
 run-ingest:
 	@echo "Running ingest_customer locally..."
-	source $(VENV_ACTIVATE) && python local_runner.py
+	. $(VENV_ACTIVATE) && python local_runner.py
 
 run-pipeline:
 	@echo "Running job pipeline: $(PIPELINE)"
-	source $(VENV_ACTIVATE) && python local_runner.py --pipeline=$(PIPELINE)
+	. $(VENV_ACTIVATE) && python local_runner.py --pipeline=$(PIPELINE)
 
 lint:
-	source $(VENV_ACTIVATE) && flake8
+	. $(VENV_ACTIVATE) && flake8
 
 format:
-	source $(VENV_ACTIVATE) && black .
+	. $(VENV_ACTIVATE) && black .
 
 deploy-ingest:
 	@echo "🚀 Deploying ingest_customer job to Databricks..."
@@ -42,8 +43,6 @@ run-ingest-remote:
 	databricks jobs run-now \
 		--profile databricks \
 		--job-id $(JOB_ID)
-
-.PHONY: sync
 
 sync:
 	@echo "🔄 Pulling latest changes from GitHub into Databricks Repos..."
