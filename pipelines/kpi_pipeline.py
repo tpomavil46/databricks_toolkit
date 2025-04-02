@@ -1,30 +1,22 @@
 """
 KPI Pipeline
 
-This pipeline simulates a multi-step process:
-
-1. Ingest customer data
-2. Transform orders
-3. (Placeholder) Generate KPIs
-
-Use this as a template for real-world multi-step workflows.
-
-Supports:
-- --input_path override
-- --output_table override
+Runs:
+1. ingest_customer
+2. transform_orders
+3. generate_kpis
 """
 
-from jobs.ingest_customer import run as ingest_customer
-from jobs.transform_orders import run as transform_orders
-
-
 def run(spark, **kwargs):
-    print("▶️ Step 1: Ingesting customer data...")
-    ingest_customer(spark, **kwargs)
+    from jobs.ingest_customer import run as ingest
+    from jobs.transform_orders import run as transform
+    from jobs.generate_kpis import run as generate
 
-    print("▶️ Step 2: Transforming orders...")
-    transform_orders(spark, **kwargs)
+    print("📥 Running ingest_customer...")
+    ingest(spark, **kwargs)
 
-    print("▶️ Step 3: (TODO) Generating KPIs...")
-    # Simulate a KPI step
-    print("📊 Example KPI: Total orders = 42 🚀")
+    print("🧪 Running transform_orders...")
+    transform(spark, **kwargs)
+
+    print("📊 Running generate_kpis...")
+    generate(spark, **kwargs)

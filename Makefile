@@ -112,3 +112,15 @@ run-kpi-remote:
 	databricks jobs run-now \
 		--profile databricks \
 		--job-id $(JOB_ID)
+
+deploy-generate-kpis:
+	@echo "🚀 Deploying generate_kpis job to Databricks..."
+	databricks jobs create \
+		--profile databricks \
+		--json-file jobs/generate_kpis_job.json
+
+run-generate-kpis-remote:
+	@echo "⚡ Running generate_kpis job remotely..."
+	databricks jobs run-now \
+		--profile databricks \
+		--job-id $(JOB_ID)

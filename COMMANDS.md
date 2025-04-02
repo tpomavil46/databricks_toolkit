@@ -39,6 +39,23 @@
 
 ---
 
+### 📊 KPI Jobs
+
+| Command | Description |
+|--------|-------------|
+| `make generate-job JOB=generate_kpis` | Generate a JSON spec for the single-step KPI job |
+| `make deploy-generate-kpis` | Deploy the `generate_kpis` job |
+| `make run-generate-kpis-remote JOB_ID=<job_id>` | Run the job remotely |
+
+### 🔗 KPI Pipelines
+
+| Command | Description |
+|--------|-------------|
+| `make deploy-kpi-pipeline` | Deploy the `kpi_pipeline` (multi-task pipeline) |
+| `make run-kpi-pipeline-remote JOB_ID=<job_id>` | Run the `kpi_pipeline` remotely |
+
+---
+
 ## ⚙️ Job JSON Files
 
 These define how your job runs.
