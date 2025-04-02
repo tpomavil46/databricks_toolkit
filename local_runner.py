@@ -2,6 +2,7 @@ import sys
 import argparse
 from pyspark.sql import SparkSession
 
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--job", help="Run a single job by name")
@@ -9,10 +10,7 @@ def main():
     args = parser.parse_args()
 
     spark = (
-        SparkSession.builder
-        .appName("LocalRunner")
-        .enableHiveSupport()
-        .getOrCreate()
+        SparkSession.builder.appName("LocalRunner").enableHiveSupport().getOrCreate()
     )
 
     def run_job(job_name):
@@ -37,6 +35,7 @@ def main():
     else:
         print("No job or pipeline specified. Use --job or --pipeline.")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

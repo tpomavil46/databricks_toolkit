@@ -1,4 +1,4 @@
-from utils.io import load_csv_to_df, write_df_as_table
+from utils.io import load_csv_to_df, write_df_as_table  # noqa: F401
 from utils.config import get_input_path
 import os
 import shutil

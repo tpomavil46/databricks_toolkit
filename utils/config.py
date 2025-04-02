@@ -10,6 +10,7 @@ def get_input_path(dataset_name: str) -> str:
         return f"/databricks-datasets/retail-org/{dataset_name}"
     return f"data/{dataset_name}.csv"
 
+
 def get_output_table(name: str) -> str:
     """
     Return a fully-qualified table name depending on environment.
