@@ -75,6 +75,9 @@ These define how your job runs.
 
 ---
 
+## 🔁 Sync Code with Databricks Repo
+- make sync
+
 ## 🏁 What's Next
 
 - Add `make deploy-transform`, `make run-transform-remote`
