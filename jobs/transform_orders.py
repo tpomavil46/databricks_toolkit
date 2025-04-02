@@ -1,5 +1,5 @@
 from utils.io import load_csv_to_df, write_df_as_table  # noqa: F401
-from utils.config import get_input_path
+from utils.config import get_input_path, get_output_table
 import os
 import shutil
 
@@ -20,4 +20,5 @@ def run(spark, **kwargs):
     df.show()
 
     # Save to local or managed table
-    df.write.mode("overwrite").saveAsTable("orders_transformed")
+    output_table = get_output_table("orders_transformed")
+    df.write.mode("overwrite").saveAsTable(output_table)
