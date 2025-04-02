@@ -7,6 +7,7 @@ Runs:
 3. generate_kpis
 """
 
+
 def run(spark, **kwargs):
     from jobs.ingest_customer import run as ingest
     from jobs.transform_orders import run as transform
