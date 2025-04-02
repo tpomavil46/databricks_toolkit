@@ -21,17 +21,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m venv .venv
-          source .venv/bin/activate
-          pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install flake8  # for lint step
 
       - name: Run tests
-        run: |
-          source .venv/bin/activate
-          make test
+        run: make test
 
       - name: Run lint (optional)
-        run: |
-          pip install flake8
-          flake8 jobs utils tests
+        run: make lint
