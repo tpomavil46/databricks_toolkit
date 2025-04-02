@@ -18,6 +18,9 @@
 | `zip -r databricks_toolkit.zip . -x ...` | Manual command to create a clean zip package of your project, excluding `.venv`, `.git`, and OS files. |
 | `databricks fs cp databricks_toolkit.zip dbfs:/Users/<email>/... --overwrite` | Uploads the zip to DBFS (no longer recommended). |
 | `make deploy-ingest` | Deploy the `jobs/ingest_customer_job.json` spec to Databricks and create a job. Returns `job_id`. |
+| `make deploy-transform` | Deploy the `jobs/transform_orders_job.json` spec to Databricks and create a job. Returns `job_id`. |
+| `make deploy-pipeline` | Deploys the `default_pipeline` multi-task job with chaining in Databricks. |
+| `make run-pipeline-remote JOB_ID=<job_id>` | Kicks off the multi-task pipeline job remotely in Databricks. |
 
 ---
 
@@ -30,6 +33,8 @@
 | `databricks runs list --job-id <job_id>` | List recent runs for a specific job. |
 | `databricks jobs list` | List all jobs in your workspace (by name and ID). |
 | `databricks jobs delete --job-id <job_id>` | Clean up an old or broken job if needed. |
+| `make run-transform-remote JOB_ID=<job_id>` | Starts a run of your deployed `transform_orders` job. |
+| `make clean-remote JOB_ID=<job_id>` | Delete a remote Databricks job cleanly from the CLI. |
 
 ---
 
@@ -42,6 +47,7 @@ These define how your job runs.
 | `jobs/ingest_customer_job.json` | Defines a Databricks job that runs `ingest_customer.py` using either an existing or new cluster. |
 | `"existing_cluster_id"` | Used to run your code on your dev cluster (`dev-firestorm`). |
 | `"python_file"` | Points to the `.py` file inside your Databricks workspace (e.g. `/Workspace/Users/<you>/...`). |
+| `jobs/transform_orders_job.json` | Defines a Databricks job that runs `transform_orders.py` with parameters for path and table. |
 
 ---
 

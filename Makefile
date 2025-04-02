@@ -62,3 +62,33 @@ run-transform-remote:
 	databricks jobs run-now \
 		--profile databricks \
 		--job-id $(JOB_ID)
+
+deploy-transform:
+	@echo "🚀 Deploying transform_orders job to Databricks..."
+	databricks jobs create \
+		--profile databricks \
+		--json-file jobs/transform_orders_job.json
+
+run-transform-remote:
+	@echo "⚡ Running transform_orders job remotely..."
+	databricks jobs run-now \
+		--profile databricks \
+		--job-id $(JOB_ID)
+
+clean-remote:
+	@echo "🧹 Deleting Databricks job ID: $(JOB_ID)..."
+	databricks jobs delete \
+		--profile databricks \
+		--job-id $(JOB_ID)
+
+deploy-pipeline:
+	@echo "🚀 Deploying default_pipeline multi-task job to Databricks..."
+	databricks jobs create \
+		--profile databricks \
+		--json-file jobs/default_pipeline_job.json
+
+run-pipeline-remote:
+	@echo "⚡ Running remote default_pipeline job..."
+	databricks jobs run-now \
+		--profile databricks \
+		--job-id $(JOB_ID)
