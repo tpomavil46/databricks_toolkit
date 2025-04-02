@@ -50,3 +50,15 @@ sync:
 		--profile databricks \
 		--path "/Repos/timpomaville663@gmail.com/databricks_toolkit" \
 		--branch main
+
+deploy-transform:
+	@echo "🚀 Deploying transform_orders job to Databricks..."
+	databricks jobs create \
+		--profile databricks \
+		--json-file jobs/transform_orders_job.json
+
+run-transform-remote:
+	@echo "⚡ Running transform_orders job remotely..."
+	databricks jobs run-now \
+		--profile databricks \
+		--job-id $(JOB_ID)
