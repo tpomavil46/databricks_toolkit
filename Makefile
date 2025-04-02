@@ -100,3 +100,15 @@ clean-remote:
 generate-job:
 	@echo "🛠 Generating job spec for: $(JOB)"
 	python scripts/generate_job_spec.py --job $(JOB)
+
+deploy-kpi:
+	@echo "🚀 Deploying kpi_pipeline job to Databricks..."
+	databricks jobs create \
+		--profile databricks \
+		--json-file jobs/kpi_pipeline_job.json
+
+run-kpi-remote:
+	@echo "⚡ Running kpi_pipeline job remotely..."
+	databricks jobs run-now \
+		--profile databricks \
+		--job-id $(JOB_ID)

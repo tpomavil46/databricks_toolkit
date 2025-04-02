@@ -45,6 +45,9 @@ You can retrieve `JOB_ID` after deploying your job spec with:
 make deploy-pipeline
 ```
 
+| `make deploy-kpi` | Deploy the `kpi_pipeline` multi-task job to Databricks |
+| `make run-kpi-remote JOB_ID=<job_id>` | Trigger a remote run of your KPI pipeline |
+
 ---
 
 ## 💡 Guidelines
@@ -61,6 +64,7 @@ make deploy-pipeline
 | Pipeline File            | Description                                |
 |--------------------------|--------------------------------------------|
 | `default_pipeline.py`    | Runs `ingest_customer` then `transform_orders` |
+| `kpi_pipeline.py` | Simulates a multi-step KPI generation flow |
 | _more coming soon..._    | Add your own!                              |
 
 ---
