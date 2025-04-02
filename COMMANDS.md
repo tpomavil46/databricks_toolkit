@@ -21,6 +21,7 @@
 | `make deploy-transform` | Deploy the `jobs/transform_orders_job.json` spec to Databricks and create a job. Returns `job_id`. |
 | `make deploy-pipeline` | Deploys the `default_pipeline` multi-task job with chaining in Databricks. |
 | `make run-pipeline-remote JOB_ID=<job_id>` | Kicks off the multi-task pipeline job remotely in Databricks. |
+| `make generate-job JOB=<job_name>` | Auto-generate a valid Databricks job spec (JSON) for the given job. |
 
 ---
 
