@@ -17,5 +17,5 @@ def run(spark, **kwargs):
     # Show the KPIs
     kpi_df.show()
 
-    # Save to table (overwrite for now)
-    df.write.mode("overwrite").saveAsTable("workspace.default.kpis_summary")
+    # Save to Unity Catalog (overwrite for now)
+    kpi_df.write.mode("overwrite").saveAsTable("main.default.kpis_summary")
