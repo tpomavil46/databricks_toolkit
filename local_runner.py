@@ -1,40 +1,43 @@
-import sys
+import importlib
 import argparse
+import os
 from pyspark.sql import SparkSession
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(description="Run Databricks Toolkit Job")
+    parser.add_argument("--job", type=str, help="Job name to run (e.g. ingest_customer)")
+    parser.add_argument("--pipeline", type=str, help="Pipeline name to run (optional)")
+    known_args, unknown_args = parser.parse_known_args()
+
+    # Parse --key=value arguments into kwargs dict
+    extra_kwargs = {}
+    for arg in unknown_args:
+        if arg.startswith("--") and "=" in arg:
+            key, value = arg[2:].split("=", 1)
+            extra_kwargs[key] = value
+
+    return known_args, extra_kwargs
+
+
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--job", help="Run a single job by name")
-    parser.add_argument("--pipeline", help="Run a full pipeline (comma-separated jobs)")
-    args = parser.parse_args()
+    os.environ["ENV"] = "local"  # Set default environment flag
+    known_args, kwargs = parse_args()
 
-    spark = (
-        SparkSession.builder.appName("LocalRunner").enableHiveSupport().getOrCreate()
-    )
+    spark = SparkSession.builder.appName("LocalJobRunner").getOrCreate()
 
-    def run_job(job_name):
-        if job_name == "ingest_customer":
-            from jobs.ingest_customer import run
-        elif job_name == "transform_orders":
-            from jobs.transform_orders import run
-        else:
-            print(f"Unknown job: {job_name}")
-            sys.exit(1)
+    if known_args.job:
+        print(f"▶️ Running job: {known_args.job}")
+        module = importlib.import_module(f"jobs.{known_args.job}")
+        module.run(spark, **kwargs)
 
-        print(f"🚀 Running job: {job_name}")
-        run(spark)
+    elif known_args.pipeline:
+        print(f"▶️ Running pipeline: {known_args.pipeline}")
+        module = importlib.import_module(f"pipelines.{known_args.pipeline}")
+        module.run(spark, **kwargs)
 
-    if args.job:
-        run_job(args.job)
-
-    elif args.pipeline:
-        job_list = [j.strip() for j in args.pipeline.split(",")]
-        for job in job_list:
-            run_job(job)
     else:
-        print("No job or pipeline specified. Use --job or --pipeline.")
-        sys.exit(1)
+        raise ValueError("Please specify --job or --pipeline")
 
 
 if __name__ == "__main__":
