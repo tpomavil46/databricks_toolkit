@@ -1,30 +1,14 @@
 {
-    "name": "KPI Pipeline",
-    "tasks": [
-      {
-        "task_key": "ingest_customer",
-        "existing_cluster_id": "0401-190124-nho4m8l8",
-        "spark_python_task": {
-          "python_file": "/Workspace/Repos/timpomaville663@gmail.com/databricks_toolkit/jobs/ingest_customer.py"
-        }
-      },
-      {
-        "task_key": "transform_orders",
-        "depends_on": [{ "task_key": "ingest_customer" }],
-        "existing_cluster_id": "0401-190124-nho4m8l8",
-        "spark_python_task": {
-          "python_file": "/Workspace/Repos/timpomaville663@gmail.com/databricks_toolkit/jobs/transform_orders.py"
-        }
-      },
-      {
-        "task_key": "generate_kpis",
-        "depends_on": [{ "task_key": "transform_orders" }],
-        "existing_cluster_id": "0401-190124-nho4m8l8",
-        "spark_python_task": {
-          "python_file": "/Workspace/Repos/timpomaville663@gmail.com/databricks_toolkit/pipelines/kpi_pipeline.py"
-        }
+  "name": "Kpi Pipeline",
+  "tasks": [
+    {
+      "task_key": "kpi_pipeline",
+      "existing_cluster_id": "0401-190124-nho4m8l8",
+      "spark_python_task": {
+        "python_file": "/Workspace/Repos/timpomaville663@gmail.com/databricks_toolkit/pipelines/kpi_pipeline.py"
       }
-    ],
-    "timeout_seconds": 3600,
-    "max_retries": 1
-  }
+    }
+  ],
+  "timeout_seconds": 3600,
+  "max_retries": 1
+}
