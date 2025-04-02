@@ -18,4 +18,4 @@ def run(spark, **kwargs):
     kpi_df.show()
 
     # Save to table (overwrite for now)
-    df.write.mode("overwrite").saveAsTable("main.default.kpis_summary")
+    df.write.mode("overwrite").saveAsTable("workspace.default.kpis_summary")
