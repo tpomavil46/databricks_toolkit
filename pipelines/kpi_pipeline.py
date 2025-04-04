@@ -9,9 +9,9 @@ Runs:
 
 
 def run(spark, **kwargs):
-    from jobs.ingest_customer import run as ingest
-    from jobs.transform_orders import run as transform
-    from jobs.generate_kpis import run as generate
+    from databricks_toolkit.bronze.ingest_customer import run as ingest
+    from databricks_toolkit.silver.transform_orders import run as transform
+    from databricks_toolkit.gold.generate_kpis import run as generate
 
     print("📥 Running ingest_customer...")
     ingest(spark, **kwargs)

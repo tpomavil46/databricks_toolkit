@@ -1,10 +1,12 @@
-from jobs.ingest_customer import run as run_ingest
-from jobs.transform_orders import run as run_transform
+from databricks_toolkit.utils.config import PipelineConfig
+from databricks_toolkit.bronze.ingest_customer import run as ingest_customer
+from databricks_toolkit.silver.transform_orders import run as transform_orders
+from databricks_toolkit.gold.generate_kpis import run as generate_kpis
 
 
-def run(spark, **kwargs):
-    print("📥 Running ingest_customer...")
-    run_ingest(spark, **kwargs)
-
-    print("🧪 Running transform_orders...")
-    run_transform(spark, **kwargs)
+def run_pipeline(config: PipelineConfig):
+    print("🚀 Starting Medallion Pipeline")
+    ingest_customer(config)
+    transform_orders(config)
+    generate_kpis(config)
+    print("✅ Pipeline completed successfully.")

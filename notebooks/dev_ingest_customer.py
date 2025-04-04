@@ -1,5 +1,5 @@
 # flake8: noqa F821
-from jobs.ingest_customer import run
+from databricks_toolkit.bronze.ingest_customer import run
 
 
 run(

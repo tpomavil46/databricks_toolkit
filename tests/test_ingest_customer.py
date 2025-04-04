@@ -1,4 +1,4 @@
-from jobs.ingest_customer import run
+from databricks_toolkit.bronze.ingest_customer import run
 from pyspark.sql import SparkSession
 import shutil
 import os

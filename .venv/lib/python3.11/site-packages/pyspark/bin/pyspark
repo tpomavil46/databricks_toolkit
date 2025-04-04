@@ -48,21 +48,40 @@ export PYSPARK_PYTHON
 export PYSPARK_DRIVER_PYTHON
 export PYSPARK_DRIVER_PYTHON_OPTS
 
+# Attempt to find JAVA_HOME.
+# If JAVA_HOME not set, install JDK 17 and set JAVA_HOME using a temp dir, and adding the
+# temp dir to the PYTHONPATH.
+if [ -n "${JAVA_HOME}" ]; then
+  RUNNER="${JAVA_HOME}/bin/java"
+else
+  if [ "$(command -v java)" ]; then
+    RUNNER="java"
+  else
+    echo -n "JAVA_HOME is not set. Would you like to install JDK 17 and set JAVA_HOME? (Y/N) " >&2
+
+    read -r input
+
+    if [[ "${input,,}" == "y" ]]; then
+        TEMP_DIR=$(mktemp -d)
+        $PYSPARK_DRIVER_PYTHON -m pip install --target="$TEMP_DIR" install-jdk
+        export JAVA_HOME=$(PYTHONPATH="$TEMP_DIR" $PYSPARK_DRIVER_PYTHON -c 'import jdk; print(jdk.install("17"))')
+        RUNNER="${JAVA_HOME}/bin/java"
+        echo "JDK was installed to the path \"$JAVA_HOME\""
+        echo "You can avoid needing to re-install JDK by setting your JAVA_HOME environment variable to \"$JAVA_HOME\""
+    else
+        echo "JDK installation skipped. You can manually install JDK (17 or later) and set JAVA_HOME in your environment."
+        exit 1
+    fi
+  fi
+fi
+
 # Add the PySpark classes to the Python path:
 export PYTHONPATH="${SPARK_HOME}/python/:$PYTHONPATH"
 export PYTHONPATH="${SPARK_HOME}/python/lib/py4j-0.10.9.7-src.zip:$PYTHONPATH"
 
 # Load the PySpark shell.py script when ./pyspark is used interactively:
 export OLD_PYTHONSTARTUP="$PYTHONSTARTUP"
-export PYTHONSTARTUP="${SPARK_HOME}/python/pyspark/shell.py"
+export PYTHONSTARTUP="${SPARK_HOME}/shell.py"
 
-# For pyspark tests
-if [[ -n "$SPARK_TESTING" ]]; then
-  unset YARN_CONF_DIR
-  unset HADOOP_CONF_DIR
-  export PYTHONHASHSEED=0
-  exec "$PYSPARK_DRIVER_PYTHON" -m "$@"
-  exit
-fi
-
-exec "${SPARK_HOME}"/bin/spark-submit pyspark-shell-main --name "PySparkShell" "$@"
+export PYTHON_SUBMIT_ARGS="$@"
+$PYSPARK_DRIVER_PYTHON

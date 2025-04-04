@@ -1,0 +1,60 @@
+# Python virtualenvs
+.venv/
+env/
+venv/
+
+# Environment variables / secrets
+.env
+*.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.egg
+
+# Jupyter / IPython
+.ipynb_checkpoints/
+
+# Databricks metadata (if syncing notebooks)
+.dbx/
+.notebook/
+.mlflow/
+
+# Build artifacts
+build/
+dist/
+*.whl
+*.egg
+*.log
+
+# Spark / Derby / local metastore
+metastore_db/
+derby.log
+spark-warehouse/
+
+# VSCode config
+.vscode/
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test cache
+.pytest_cache/
+coverage.xml
+htmlcov/
+.cache/
+
+# Zip archives or generated test files
+*.zip
+*.parquet
+*.csv
+
+# Local job specs or dev runs
+jobs/*.json
+local_runner.py
