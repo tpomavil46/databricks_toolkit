@@ -2,6 +2,7 @@ import os
 import json
 import argparse
 from typing import Any, Dict, cast
+from utils.logger import log_function_call
 
 BASE_JOB_SPEC = {
     "name": None,
@@ -19,6 +20,7 @@ BASE_JOB_SPEC = {
 }
 
 
+@log_function_call
 def generate_spec(job_name: str, email: str):
     # Safely cast to a dictionary to satisfy Mypy or type checkers
     spec = cast(Dict[str, Any], BASE_JOB_SPEC.copy())

@@ -9,7 +9,7 @@ Runs:
 
 
 def run(spark, **kwargs):
-    from databricks_toolkit.bronze.ingest_customer import run as ingest
+    from databricks_toolkit.bronze.ingest_customers import run as ingest
     from databricks_toolkit.silver.transform_orders import run as transform
     from databricks_toolkit.gold.generate_kpis import run as generate
 

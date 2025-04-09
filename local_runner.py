@@ -1,14 +1,14 @@
 import argparse
 import os
-from pyspark.sql import SparkSession
+from databricks.connect import DatabricksSession
 from importlib import import_module
+from utils.logger import log_function_call
 
 
+@log_function_call
 def parse_args():
     parser = argparse.ArgumentParser(description="Run Databricks Toolkit Job")
-    parser.add_argument(
-        "--job", type=str, help="Job name to run (e.g. ingest_customer)"
-    )
+    parser.add_argument("--job", type=str, help="Job name to run (e.g. ingest_customer)")
     parser.add_argument("--pipeline", type=str, help="Pipeline name to run (optional)")
     known_args, unknown_args = parser.parse_known_args()
 
@@ -22,6 +22,7 @@ def parse_args():
     return known_args, extra_kwargs
 
 
+@log_function_call
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--job", help="Job module to run", required=False)
@@ -30,7 +31,7 @@ def main():
     parser.add_argument("--output_table", help="Override output table", required=False)
 
     args = parser.parse_args()
-    spark = SparkSession.builder.appName("DatabricksToolkit").getOrCreate()
+    spark = DatabricksSession.builder.getOrCreate()
 
     kwargs = {
         k: v
@@ -38,16 +39,15 @@ def main():
         if k not in ["job", "pipeline"] and v is not None
     }
 
-    # 🌍 Environment awareness
     current_env = os.getenv("ENV", "local")
     print(f"🌍 Running in environment: {current_env}")
 
     if args.job:
-        module = import_module(f"jobs.{args.job}")
+        module = import_module(args.job)
         print(f"▶️ Running job: {args.job}")
         module.run(spark, **kwargs)
     elif args.pipeline:
-        module = import_module(f"pipelines.{args.pipeline}")
+        module = import_module(args.pipeline)
         print(f"▶️ Running pipeline: {args.pipeline}")
         module.run(spark, **kwargs)
     else:
