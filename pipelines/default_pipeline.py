@@ -29,8 +29,8 @@ def run(spark, **kwargs):
         bronze_output=kwargs.get("bronze_path"),
         silver_output=kwargs.get("silver_path"),
         gold_output=kwargs.get("gold_path"),
-        vendor_filter=kwargs.get("vendor_filter"),        # For gold
-        view_or_table=kwargs.get("view_or_table", "view") # Default to view
+        vendor_filter=kwargs.get("vendor_filter"),  # For gold
+        view_or_table=kwargs.get("view_or_table", "view"),  # Default to view
     )
 
     pipeline.run_bronze()

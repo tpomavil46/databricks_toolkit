@@ -24,5 +24,5 @@ def create_kpis(df: DataFrame) -> DataFrame:
     return df.agg(
         F.sum("amount").alias("total_revenue"),
         F.avg("distance").alias("avg_trip_distance"),
-        F.count("*").alias("total_trips")
+        F.count("*").alias("total_trips"),
     )

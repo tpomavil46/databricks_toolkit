@@ -32,27 +32,20 @@ class MedallionPipeline:
             "gold_output": self.gold_output,
         }
 
-
     @log_function_call
     def run_bronze(self):
-        dataset = self.input_table
+        from jobs.bronze.ingest import ingest_data
 
-        if dataset == "nytaxi":
-            from bronze.ingest import run as ingest_nytaxi
-            df = ingest_nytaxi(self.spark, **self.extra)
+        dataset = self.extra.get("dataset")
+        paths = self.extra.get("input_paths")
+        if isinstance(paths, str):
+            paths = [p.strip() for p in paths.split(",")]
 
-        elif dataset == "customers":
-            from bronze.ingest_customers import run as ingest_customers
-            df = ingest_customers(self.spark, **self.extra)
+        df = ingest_data(self.spark, dataset=dataset, input_paths=paths)
 
-        elif dataset and dataset.startswith("dbfs:"):
-            from bronze.ingest_nytaxi import ingest_data  # <- raw CSV loader
-            df = ingest_data(self.spark, dataset, self.bronze_output)
-
-        else:
-            raise ValueError(f"❌ Unknown bronze dataset: {dataset}")
-
-        write_df_as_table_or_path(self.spark, df, self.bronze_output, format=self.format)
+        write_df_as_table_or_path(
+            self.spark, df, self.bronze_output, format=self.format
+        )
 
     @log_function_call
     def run_silver(self):

@@ -41,7 +41,13 @@ def run(spark: SparkSession, *args, **kwargs):
     logger.info("🔧 Flattening struct columns...")
     df_flattened = flatten_struct(df_bronze)
 
-    required = ["passenger_count", "tolls_amount", "fare_amount", "vendor", "trip_distance"]
+    required = [
+        "passenger_count",
+        "tolls_amount",
+        "fare_amount",
+        "vendor",
+        "trip_distance",
+    ]
     missing = [col for col in required if col not in df_flattened.columns]
     if missing:
         raise ValueError(f"❌ Missing expected columns in bronze data: {missing}")
@@ -52,7 +58,9 @@ def run(spark: SparkSession, *args, **kwargs):
             "passenger_type",
             F.when(df_flattened.passenger_count > 1, "multi").otherwise("single"),
         )
-        .withColumn("has_tolls", F.when(df_flattened.tolls_amount > 0, True).otherwise(False))
+        .withColumn(
+            "has_tolls", F.when(df_flattened.tolls_amount > 0, True).otherwise(False)
+        )
         .withColumn("amount_rounded", F.ceil(df_flattened.fare_amount))
     ).select(
         "vendor",
@@ -73,8 +81,12 @@ def run(spark: SparkSession, *args, **kwargs):
 @log_function_call
 def main():
     parser = argparse.ArgumentParser(description="Run Silver transformations.")
-    parser.add_argument("--bronze_input", type=str, required=True, help="Bronze input table name")
-    parser.add_argument("--silver_output", type=str, required=True, help="Silver output table name")
+    parser.add_argument(
+        "--bronze_input", type=str, required=True, help="Bronze input table name"
+    )
+    parser.add_argument(
+        "--silver_output", type=str, required=True, help="Silver output table name"
+    )
     args = parser.parse_args()
 
     spark = (

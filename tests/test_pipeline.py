@@ -43,7 +43,9 @@ def test_silver_transform_nytaxi(spark):
         pytest.skip(f"❌ Bronze table not found: {bronze_input}")
 
     try:
-        df_silver = transform_data(spark, bronze_input=bronze_input, silver_output=silver_output)
+        df_silver = transform_data(
+            spark, bronze_input=bronze_input, silver_output=silver_output
+        )
     except Exception as e:
         pytest.fail(f"❌ Silver transformation failed: {e}")
 
@@ -62,8 +64,11 @@ def test_gold_stage_nytaxi(spark):
 
     create_gold_stage(spark, silver_input, gold_output, view_or_table="view")
 
-    assert check_table_exists(spark, gold_output), f"Gold view {gold_output} not created"
+    assert check_table_exists(
+        spark, gold_output
+    ), f"Gold view {gold_output} not created"
     assert check_table_exists(spark, f"{gold_output}_kpis"), "KPI table not created"
+
 
 def check_table_exists(spark, table_name: str) -> bool:
     try:
