@@ -1,37 +1,63 @@
-# utils/structs.py
-
-import pyspark.sql.functions as F
-import pyspark.sql.types as T  # Import the `pyspark.sql.types` module as T
-from pyspark.sql import DataFrame  # noqa: F821
+from pyspark.sql.types import (
+    StructType, StructField, StringType, TimestampType, IntegerType, DoubleType
+)
 from utils.logger import log_function_call
 
 
 @log_function_call
-def flatten_struct(df: DataFrame) -> DataFrame:
+def get_column_mapping(dataset: str) -> dict:
     """
-    Flattens any struct columns in a DataFrame. This function will go through all the columns in the DataFrame,
-    and if a column is a struct, it will flatten it by creating new columns for each field within the struct.
+    Returns a mapping from original column names to normalized schema for a dataset.
 
     Args:
-    df (DataFrame): The input DataFrame.
+        dataset (str): Dataset identifier, e.g., 'yellow' or 'green'.
 
     Returns:
-    DataFrame: The flattened DataFrame with struct fields as top-level columns.
+        dict: Mapping of column names to standard schema names.
     """
-    flat_columns = []
-    for column in df.columns:
-        # Check if the column is a struct
-        if isinstance(
-            df.schema[column].dataType, T.StructType
-        ):  # Use `T.StructType` here
-            for field in df.schema[column].dataType.fields:
-                # Create new column for each field in the struct
-                flat_columns.append(
-                    F.col(f"{column}.{field.name}").alias(f"{column}_{field.name}")
-                )
-        else:
-            # Non-struct column, just add it as-is
-            flat_columns.append(F.col(column))
-
-    # Select the flattened columns
-    return df.select(*flat_columns)
+    if dataset == "yellow":
+        return {
+            "VendorID": "vendor",
+            "tpep_pickup_datetime": "pickup_datetime",
+            "tpep_dropoff_datetime": "dropoff_datetime",
+            "passenger_count": "passenger_count",
+            "trip_distance": "trip_distance",
+            "RatecodeID": "rate_code",
+            "store_and_fwd_flag": "store_and_forward",
+            "PULocationID": "pickup_location",
+            "DOLocationID": "dropoff_location",
+            "payment_type": "payment_type",
+            "fare_amount": "fare_amount",
+            "extra": "extra",
+            "mta_tax": "mta_tax",
+            "tip_amount": "tip_amount",
+            "tolls_amount": "tolls_amount",
+            "improvement_surcharge": "surcharge",
+            "total_amount": "total_amount",
+            "congestion_surcharge": "congestion_surcharge"
+        }
+    elif dataset == "green":
+        return {
+            "VendorID": "vendor",
+            "lpep_pickup_datetime": "pickup_datetime",
+            "lpep_dropoff_datetime": "dropoff_datetime",
+            "passenger_count": "passenger_count",
+            "trip_distance": "trip_distance",
+            "RatecodeID": "rate_code",
+            "store_and_fwd_flag": "store_and_forward",
+            "PULocationID": "pickup_location",
+            "DOLocationID": "dropoff_location",
+            "payment_type": "payment_type",
+            "fare_amount": "fare_amount",
+            "extra": "extra",
+            "mta_tax": "mta_tax",
+            "tip_amount": "tip_amount",
+            "tolls_amount": "tolls_amount",
+            "improvement_surcharge": "surcharge",
+            "total_amount": "total_amount",
+            "trip_type": "trip_type",
+            "ehail_fee": "ehail_fee",
+            "congestion_surcharge": "congestion_surcharge"
+        }
+    else:
+        raise ValueError(f"Unknown dataset for column mapping: {dataset}")
