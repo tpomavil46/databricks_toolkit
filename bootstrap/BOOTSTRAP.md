@@ -20,15 +20,15 @@ explore_dbfs_path(
 ) -> List[str]
 ```
 
-Arguments:
+**Arguments**:
     file_path: Path to the file in DBFS.
 	file_format: File format to read with (e.g., csv, parquet, json).
 	limit: Number of rows to return from the file.
 
-Returns:
+**Returns**:
 	A Spark DataFrame with the previewed content.
 
-Notes:
+**Notes**:
 	CSV files are read with .option("header", True) if format is csv.
 
 ---
