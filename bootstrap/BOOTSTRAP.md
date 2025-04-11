@@ -32,23 +32,3 @@ Notes:
 	CSV files are read with .option("header", True) if format is csv.
 
 ---
-
-preview_cli.py
-
-Description:
-Preview a file from DBFS using Spark SQL with format-specific logic.
-
-Usage:
-```python
-python cli/preview_cli.py --file /databricks-datasets/path/file.csv --format csv --limit 10
-```
-
-Options:
-	--file: File path to read (absolute DBFS path).
-	--format: Format of the file (csv, parquet, delta, etc.).
-	--limit: Number of rows to preview (default: 10).
-
-Examples:
-```python
-python cli/preview_cli.py --file /databricks-datasets/wine-quality/winequality-red.csv --format csv --limit 5
-```
