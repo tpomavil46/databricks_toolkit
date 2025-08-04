@@ -16,7 +16,7 @@ def main():
     # Alternate way to configure your Spark session:
     spark = (
         DatabricksSession.builder.profile("databricks")
-        .clusterId("0401-190124-nho4m8l8")
+        .clusterId("5802-005055-h7vtizbe")
         .getOrCreate()
     )
 

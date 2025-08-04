@@ -31,6 +31,17 @@ def main():
         action="store_true",
         help="Disable recursive traversal.",
     )
+    parser.add_argument(
+        "--limit",
+        type=int,
+        help="Maximum number of paths to return",
+    )
+    parser.add_argument(
+        "--offset",
+        type=int,
+        default=0,
+        help="Number of paths to skip (for pagination)",
+    )
 
     args = parser.parse_args()
 
@@ -43,13 +54,23 @@ def main():
             path=args.path,
             recursive=not args.no_recursive,
             files_only=args.files_only,
+            limit=args.limit,
+            offset=args.offset,
         )
     except Exception as e:
         print(f"❌ Failed to explore DBFS path: {e}")
         sys.exit(1)
 
     if paths:
-        print(f"\n✅ {len(paths)} paths discovered:\n")
+        total_found = len(paths)
+        limit_info = f" (showing {total_found}"
+        if args.limit:
+            limit_info += f" of max {args.limit}"
+        if args.offset:
+            limit_info += f", offset {args.offset}"
+        limit_info += ")"
+        
+        print(f"\n✅ {total_found} paths discovered{limit_info}:\n")
         for p in paths:
             print(p)
     else:

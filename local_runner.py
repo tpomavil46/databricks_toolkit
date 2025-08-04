@@ -30,7 +30,7 @@ def main():
     parser.add_argument("--input_path", help="Override input path", required=False)
     parser.add_argument("--output_table", help="Override output table", required=False)
 
-    args = parser.parse_args()
+    args, extra_kwargs = parse_args()
     spark = DatabricksSession.builder.getOrCreate()
 
     kwargs = {
@@ -38,16 +38,40 @@ def main():
         for k, v in vars(args).items()
         if k not in ["job", "pipeline"] and v is not None
     }
+    # Add extra kwargs from command line
+    kwargs.update(extra_kwargs)
 
     current_env = os.getenv("ENV", "local")
     print(f"🌍 Running in environment: {current_env}")
 
     if args.job:
-        module = import_module(args.job)
+        # Handle subdirectories by checking if job contains '/'
+        if '/' in args.job:
+            module = import_module(args.job)
+        else:
+            # Try to import from pipelines/, eda/, then root
+            try:
+                module = import_module(f"pipelines.{args.job}")
+            except ImportError:
+                try:
+                    module = import_module(f"eda.{args.job}")
+                except ImportError:
+                    module = import_module(args.job)
         print(f"▶️ Running job: {args.job}")
         module.run(spark, **kwargs)
     elif args.pipeline:
-        module = import_module(args.pipeline)
+        # Handle subdirectories by checking if pipeline contains '/'
+        if '/' in args.pipeline:
+            module = import_module(args.pipeline)
+        else:
+            # Try to import from pipelines/, eda/, then root
+            try:
+                module = import_module(f"pipelines.{args.pipeline}")
+            except ImportError:
+                try:
+                    module = import_module(f"eda.{args.pipeline}")
+                except ImportError:
+                    module = import_module(args.pipeline)
         print(f"▶️ Running pipeline: {args.pipeline}")
         module.run(spark, **kwargs)
     else:
