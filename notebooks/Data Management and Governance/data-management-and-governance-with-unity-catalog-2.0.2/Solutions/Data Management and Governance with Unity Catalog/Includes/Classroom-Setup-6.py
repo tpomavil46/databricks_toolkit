@@ -7,20 +7,20 @@ DA = DBAcademyHelper()
 DA.init()
 
 ## Create a new schema
-spark.sql('CREATE SCHEMA IF NOT EXISTS example')
+spark.sql("CREATE SCHEMA IF NOT EXISTS example")
 
 ## Make our newly created schema the default
-spark.sql('USE SCHEMA example')
+spark.sql("USE SCHEMA example")
 
 # COMMAND ----------
 
 
-
 ## Create the silver table
-r = spark.sql('DROP TABLE IF EXISTS silver')
+r = spark.sql("DROP TABLE IF EXISTS silver")
 
 print("\nCreating the silver table in your catalog's example schema")
-r = spark.sql('''
+r = spark.sql(
+    """
 CREATE OR REPLACE TABLE silver (
   device_id  INT,
   mrn        STRING,
@@ -28,9 +28,11 @@ CREATE OR REPLACE TABLE silver (
   time       TIMESTAMP,
   heartrate  DOUBLE
 )
-''')
+"""
+)
 
-r = spark.sql('''
+r = spark.sql(
+    """
 INSERT OVERWRITE silver VALUES
   (23,'40580129','Nicholas Spears','2020-02-01T00:01:58.000+0000',54.0122153343),
   (17,'52804177','Lynn Russell','2020-02-01T00:02:55.000+0000',92.5136468131),
@@ -62,12 +64,14 @@ INSERT OVERWRITE silver VALUES
   (17,'52804177','Lynn Russell','2020-02-01T00:32:56.000+0000',50),
   (37,'65300842','Samuel Hughes','2020-02-01T00:38:54.000+0000',30),
   (23,'40580129','Nicholas Spears','2020-02-01T00:46:57.000+0000',80)
-''')
+"""
+)
 
 # COMMAND ----------
 
-DA.display_config_values([
-            ('Your Unity Catalog name', DA.catalog_name),
-            ('Your Course Schema Name', 'example')
-        ]
-    )
+DA.display_config_values(
+    [
+        ("Your Unity Catalog name", DA.catalog_name),
+        ("Your Course Schema Name", "example"),
+    ]
+)

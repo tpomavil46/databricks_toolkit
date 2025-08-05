@@ -10,7 +10,9 @@ DA.init()
 DA.create_schema_table_view()
 
 
-DA.display_config_values([('Your Unity Catalog name',DA.catalog_name),('Your Default Schema', "example")])
+DA.display_config_values(
+    [("Your Unity Catalog name", DA.catalog_name), ("Your Default Schema", "example")]
+)
 
 # COMMAND ----------
 

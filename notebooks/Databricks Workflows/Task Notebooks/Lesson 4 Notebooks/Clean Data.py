@@ -3,5 +3,5 @@
 
 # COMMAND ----------
 
-dbutils.jobs.taskValues.set(key = 'bad_records', value = 5)
+dbutils.jobs.taskValues.set(key="bad_records", value=5)
 print("Clean Data Task")

@@ -1,5 +1,10 @@
 from pyspark.sql.types import (
-    StructType, StructField, StringType, TimestampType, IntegerType, DoubleType
+    StructType,
+    StructField,
+    StringType,
+    TimestampType,
+    IntegerType,
+    DoubleType,
 )
 from utils.logger import log_function_call
 
@@ -34,7 +39,7 @@ def get_column_mapping(dataset: str) -> dict:
             "tolls_amount": "tolls_amount",
             "improvement_surcharge": "surcharge",
             "total_amount": "total_amount",
-            "congestion_surcharge": "congestion_surcharge"
+            "congestion_surcharge": "congestion_surcharge",
         }
     elif dataset == "green":
         return {
@@ -57,7 +62,7 @@ def get_column_mapping(dataset: str) -> dict:
             "total_amount": "total_amount",
             "trip_type": "trip_type",
             "ehail_fee": "ehail_fee",
-            "congestion_surcharge": "congestion_surcharge"
+            "congestion_surcharge": "congestion_surcharge",
         }
     else:
         raise ValueError(f"Unknown dataset for column mapping: {dataset}")

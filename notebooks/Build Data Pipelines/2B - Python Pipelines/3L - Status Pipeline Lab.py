@@ -21,7 +21,7 @@
 # MAGIC
 # MAGIC ## Learning Objectives
 # MAGIC By the end of this lesson, students should feel comfortable:
-# MAGIC * Identifying and troubleshooting DLT syntax 
+# MAGIC * Identifying and troubleshooting DLT syntax
 # MAGIC * Iteratively developing DLT pipelines with notebooks
 
 # COMMAND ----------
@@ -84,7 +84,7 @@
 #             .option("cloudFiles.format", "json")
 #             .load(f"{source}/status")
 #             .select(
-#                 F.current_timestamp().alias("processing_time"), 
+#                 F.current_timestamp().alias("processing_time"),
 #                 "*"
 #             )
 #     )
@@ -107,10 +107,10 @@
 #     return (
 #         spark.read("status_silver").alias("a")      ## Correctly read the status_silver
 #             .join(
-#                 dlt.read("subscribed_order_emails_v").alias("b"), 
+#                 dlt.read("subscribed_order_emails_v").alias("b"),
 #                 on="order_id"
 #             ).select(
-#                 "a.*", 
+#                 "a.*",
 #                 "b.email"
 #             )
 #     )
@@ -123,45 +123,35 @@ import pyspark.sql.functions as F
 
 source = spark.conf.get("source")
 
+
 ## Step 1
 @dlt.table
 def status_bronze():
     return (
-        spark.readStream
-            .format("cloudFiles")
-            .option("cloudFiles.format", "json")
-            .load(f"{source}/status")
-            .select(
-                F.current_timestamp().alias("processing_time"), 
-                "*"
-            )
+        spark.readStream.format("cloudFiles")
+        .option("cloudFiles.format", "json")
+        .load(f"{source}/status")
+        .select(F.current_timestamp().alias("processing_time"), "*")
     )
 
 
 ## Step 2
-@dlt.table(
-    name = "status_silver"
-    )
+@dlt.table(name="status_silver")
 @dlt.expect_or_drop("valid_timestamp", "status_timestamp > 1640600000")
 def status_silver():
-    return (
-        dlt.read_stream("status_bronze")
-            .drop("_rescued_data")
-    )
+    return dlt.read_stream("status_bronze").drop("_rescued_data")
+
 
 ## Step 3
 @dlt.table
 def email_updates():
     return (
-        dlt.read("status_silver").alias("a")                        
-            .join(
-                dlt.read("subscribed_order_emails_v").alias("b"), 
-                on="order_id"
-            ).select(
-                "a.*", 
-                "b.email"
-            )
+        dlt.read("status_silver")
+        .alias("a")
+        .join(dlt.read("subscribed_order_emails_v").alias("b"), on="order_id")
+        .select("a.*", "b.email")
     )
+
 
 # COMMAND ----------
 
@@ -170,7 +160,7 @@ def email_updates():
 # MAGIC The issues in each query:
 # MAGIC 1. (Step 1) Add the **`@dlt.table`** decorator before the **`def status_bronze()`** function definition
 # MAGIC
-# MAGIC 2. (Step 2) Change the argument from **`my_table_name`** to **`name`**. 
+# MAGIC 2. (Step 2) Change the argument from **`my_table_name`** to **`name`**.
 # MAGIC
 # MAGIC 3. (Step 3) To perform a read on a table in the DLT pipeline, use **`dlt.read`** not **`spark.read`**
 
@@ -192,7 +182,7 @@ def email_updates():
 # MAGIC ## Summary
 # MAGIC
 # MAGIC By reviewing this notebook, you should now feel comfortable:
-# MAGIC * Identifying and troubleshooting DLT syntax 
+# MAGIC * Identifying and troubleshooting DLT syntax
 # MAGIC * Iteratively developing DLT pipelines with notebooks
 
 # COMMAND ----------
@@ -200,8 +190,8 @@ def email_updates():
 # MAGIC %md
 # MAGIC
 # MAGIC &copy; 2025 Databricks, Inc. All rights reserved.<br/>
-# MAGIC Apache, Apache Spark, Spark and the Spark logo are trademarks of the 
+# MAGIC Apache, Apache Spark, Spark and the Spark logo are trademarks of the
 # MAGIC <a href="https://www.apache.org/">Apache Software Foundation</a>.<br/>
-# MAGIC <br/><a href="https://databricks.com/privacy-policy">Privacy Policy</a> | 
-# MAGIC <a href="https://databricks.com/terms-of-use">Terms of Use</a> | 
+# MAGIC <br/><a href="https://databricks.com/privacy-policy">Privacy Policy</a> |
+# MAGIC <a href="https://databricks.com/terms-of-use">Terms of Use</a> |
 # MAGIC <a href="https://help.databricks.com/">Support</a>

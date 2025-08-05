@@ -69,7 +69,7 @@ def main():
         if args.offset:
             limit_info += f", offset {args.offset}"
         limit_info += ")"
-        
+
         print(f"\n✅ {total_found} paths discovered{limit_info}:\n")
         for p in paths:
             print(p)

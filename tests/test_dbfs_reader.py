@@ -10,7 +10,7 @@ def test_preview_dbfs_file():
         file_path="/databricks-datasets/wine-quality/winequality-red.csv",
         file_format="csv",
         limit=10,
-        options={"header": "true", "inferSchema": "true", "sep": ";"}
+        options={"header": "true", "inferSchema": "true", "sep": ";"},
     )
 
     assert df.count() > 0

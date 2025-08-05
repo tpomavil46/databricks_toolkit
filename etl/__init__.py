@@ -15,8 +15,8 @@ from .core.validators import DataValidator
 from .core.config import PipelineConfig
 
 __all__ = [
-    'StandardETLPipeline',
-    'DataTransformation', 
-    'DataValidator',
-    'PipelineConfig'
-] 
+    "StandardETLPipeline",
+    "DataTransformation",
+    "DataValidator",
+    "PipelineConfig",
+]

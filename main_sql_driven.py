@@ -26,7 +26,7 @@ load_dotenv()
 def main():
     """
     Main entry point for SQL-driven pipeline.
-    
+
     This demonstrates how to:
     - Accept SQL files as arguments to Python code
     - Keep SQL and Python separated
@@ -45,30 +45,18 @@ def main():
         help="Input path or table (CSV, JSON, etc.)",
     )
     parser.add_argument(
-        "--bronze_path", 
-        type=str, 
-        required=True, 
-        help="Target Bronze table name"
+        "--bronze_path", type=str, required=True, help="Target Bronze table name"
     )
     parser.add_argument(
-        "--silver_path", 
-        type=str, 
-        required=True, 
-        help="Target Silver table name"
+        "--silver_path", type=str, required=True, help="Target Silver table name"
     )
     parser.add_argument(
-        "--gold_path", 
-        type=str, 
-        required=True, 
-        help="Target Gold table name"
+        "--gold_path", type=str, required=True, help="Target Gold table name"
     )
-    
+
     # Optional parameters
     parser.add_argument(
-        "--format", 
-        type=str, 
-        default="delta", 
-        help="Storage format (default: delta)"
+        "--format", type=str, default="delta", help="Storage format (default: delta)"
     )
     parser.add_argument(
         "--vendor_filter",
@@ -89,7 +77,9 @@ def main():
     # Using the same pattern as your etl_example.py
     spark = (
         DatabricksSession.builder.profile("databricks")
-        .clusterId("5802-005055-h7vtizbe")  # Your current cluster ID from etl_example.py
+        .clusterId(
+            "5802-005055-h7vtizbe"
+        )  # Your current cluster ID from etl_example.py
         .getOrCreate()
     )
 
@@ -112,18 +102,18 @@ def main():
         silver_path=args.silver_path,
         gold_path=args.gold_path,
         format=args.format,
-        vendor_filter=args.vendor_filter
+        vendor_filter=args.vendor_filter,
     )
 
     # Report results
-    if results['success']:
+    if results["success"]:
         print(f"✅ Pipeline completed successfully!")
         print(f"   Steps completed: {', '.join(results['steps_completed'])}")
     else:
         print(f"❌ Pipeline failed!")
-        for error in results['errors']:
+        for error in results["errors"]:
             print(f"   Error: {error}")
 
 
 if __name__ == "__main__":
-    main() 
+    main()

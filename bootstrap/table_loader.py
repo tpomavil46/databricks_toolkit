@@ -40,7 +40,7 @@ def copy_into_table(
         table_name=table_name,
         file_path=file_path,
         file_format=file_format,
-        options=",\n  ".join([f"'{k}' = '{v}'" for k, v in options.items()])
+        options=",\n  ".join([f"'{k}' = '{v}'" for k, v in options.items()]),
     )
 
     print(f"🧾 Executing COPY INTO for table: {table_name}")

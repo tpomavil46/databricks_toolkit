@@ -32,9 +32,9 @@
 # MAGIC %md
 # MAGIC ## A. About DLT Library Notebooks
 # MAGIC
-# MAGIC DLT syntax is not intended for interactive execution in a notebook. This notebook will need to be scheduled as part of a DLT pipeline for proper execution. 
+# MAGIC DLT syntax is not intended for interactive execution in a notebook. This notebook will need to be scheduled as part of a DLT pipeline for proper execution.
 # MAGIC
-# MAGIC At the time this notebook was written, the current Databricks runtime does not include the **`dlt`** module, so trying to execute any DLT commands in a notebook will fail. 
+# MAGIC At the time this notebook was written, the current Databricks runtime does not include the **`dlt`** module, so trying to execute any DLT commands in a notebook will fail.
 # MAGIC
 # MAGIC We'll discuss developing and troubleshooting DLT code later in the course.
 # MAGIC
@@ -111,19 +111,17 @@ source = spark.conf.get("source")
 
 # COMMAND ----------
 
+
 @dlt.table
 def orders_bronze():
     return (
-        spark.readStream
-            .format("cloudFiles")
-            .option("cloudFiles.format", "json")
-            .option("cloudFiles.inferColumnTypes", True)
-            .load(f"{source}/orders")
-            .select(
-                F.current_timestamp().alias("processing_time"), 
-                "*"
-            )
+        spark.readStream.format("cloudFiles")
+        .option("cloudFiles.format", "json")
+        .option("cloudFiles.inferColumnTypes", True)
+        .load(f"{source}/orders")
+        .select(F.current_timestamp().alias("processing_time"), "*")
     )
+
 
 # COMMAND ----------
 
@@ -165,21 +163,21 @@ def orders_bronze():
 
 # COMMAND ----------
 
+
 @dlt.table(
-    comment = "Append only orders with valid timestamps",
-    table_properties = {"quality": "silver"})
+    comment="Append only orders with valid timestamps",
+    table_properties={"quality": "silver"},
+)
 @dlt.expect_or_fail("valid_date", F.col("order_timestamp") > "2021-01-01")
 def orders_silver():
-    return (
-        dlt.read_stream("orders_bronze")
-            .select(
-                "processing_time",
-                "customer_id",
-                "notifications",
-                "order_id",
-                F.col("order_timestamp").cast("timestamp").alias("order_timestamp")
-            )
+    return dlt.read_stream("orders_bronze").select(
+        "processing_time",
+        "customer_id",
+        "notifications",
+        "order_id",
+        F.col("order_timestamp").cast("timestamp").alias("order_timestamp"),
     )
+
 
 # COMMAND ----------
 
@@ -206,13 +204,15 @@ def orders_silver():
 
 # COMMAND ----------
 
+
 @dlt.table
 def orders_by_date():
     return (
         dlt.read("orders_silver")
-            .groupBy(F.col("order_timestamp").cast("date").alias("order_date"))
-            .agg(F.count("*").alias("total_daily_orders"))
+        .groupBy(F.col("order_timestamp").cast("date").alias("order_date"))
+        .agg(F.count("*").alias("total_daily_orders"))
     )
+
 
 # COMMAND ----------
 
@@ -234,8 +234,8 @@ def orders_by_date():
 # MAGIC %md
 # MAGIC
 # MAGIC &copy; 2025 Databricks, Inc. All rights reserved.<br/>
-# MAGIC Apache, Apache Spark, Spark and the Spark logo are trademarks of the 
+# MAGIC Apache, Apache Spark, Spark and the Spark logo are trademarks of the
 # MAGIC <a href="https://www.apache.org/">Apache Software Foundation</a>.<br/>
-# MAGIC <br/><a href="https://databricks.com/privacy-policy">Privacy Policy</a> | 
-# MAGIC <a href="https://databricks.com/terms-of-use">Terms of Use</a> | 
+# MAGIC <br/><a href="https://databricks.com/privacy-policy">Privacy Policy</a> |
+# MAGIC <a href="https://databricks.com/terms-of-use">Terms of Use</a> |
 # MAGIC <a href="https://help.databricks.com/">Support</a>

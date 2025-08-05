@@ -1,6 +1,9 @@
 # bootstrap/query_templates.py
 
-def generate_select_all_query(file_path: str, file_format: str, limit: int, options: dict = None) -> str:
+
+def generate_select_all_query(
+    file_path: str, file_format: str, limit: int, options: dict = None
+) -> str:
     """
     Generates a Spark SQL query for reading a file in a given format with a row limit.
 
@@ -15,6 +18,8 @@ def generate_select_all_query(file_path: str, file_format: str, limit: int, opti
     """
     options_clause = ""
     if options:
-        options_clause = " OPTIONS (" + ", ".join([f"{k} '{v}'" for k, v in options.items()]) + ")"
-    
+        options_clause = (
+            " OPTIONS (" + ", ".join([f"{k} '{v}'" for k, v in options.items()]) + ")"
+        )
+
     return f"SELECT * FROM {file_format}.`{file_path}`{options_clause} LIMIT {limit}"

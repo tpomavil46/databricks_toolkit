@@ -2,7 +2,7 @@
 
 VENV_ACTIVATE=.venv/bin/activate
 
-.PHONY: help test lint format sync \
+.PHONY: help test test-integration lint format sync \
         run run-ingest run-pipeline \
         deploy-ingest run-ingest-remote \
         deploy-transform run-transform-remote \
@@ -12,6 +12,7 @@ VENV_ACTIVATE=.venv/bin/activate
 help:
 	@echo "Available targets:"
 	@echo "  make test                    Run unit tests"
+	@echo "  make test-integration        Run integration tests"
 	@echo "  make lint                    Run flake8 linter"
 	@echo "  make format                  Auto-format code with black"
 	@echo "  make sync                    Sync GitHub -> Databricks Repos"
@@ -27,8 +28,12 @@ help:
 	@echo "  make generate-job JOB=<job>  Generate JSON spec"
 
 test:
-	@echo "Running tests..."
+	@echo "Running unit tests..."
 	PYTHONPATH=. . $(VENV_ACTIVATE) && pytest tests
+
+test-integration:
+	@echo "Running integration tests..."
+	. $(VENV_ACTIVATE) && python tests/run_integration_tests.py
 
 lint:
 	. $(VENV_ACTIVATE) && flake8

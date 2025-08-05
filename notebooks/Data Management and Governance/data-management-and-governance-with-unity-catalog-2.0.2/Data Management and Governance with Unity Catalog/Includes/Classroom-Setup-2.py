@@ -13,11 +13,11 @@ DA.create_schema_table_view()
 DA.cleanup_hive_metastore()
 
 
-DA.display_config_values([
-        ('Your Unity Catalog name',DA.catalog_name),
-        ('Your Schema Name','example'),    
-        ]
-    )
+DA.display_config_values(
+    [
+        ("Your Unity Catalog name", DA.catalog_name),
+        ("Your Schema Name", "example"),
+    ]
+)
 
 # COMMAND ----------
-

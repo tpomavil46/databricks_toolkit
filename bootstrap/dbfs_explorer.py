@@ -11,7 +11,13 @@ from utils.logger import log_function_call
 
 
 @log_function_call
-def explore_dbfs_path(path: str = "dbfs:/databricks-datasets/", recursive: bool = False, files_only: bool = False, limit: int = None, offset: int = 0) -> List[str]:
+def explore_dbfs_path(
+    path: str = "dbfs:/databricks-datasets/",
+    recursive: bool = False,
+    files_only: bool = False,
+    limit: int = None,
+    offset: int = 0,
+) -> List[str]:
     """
     Lists immediate or recursive DBFS contents using the Databricks SDK.
 
@@ -44,14 +50,14 @@ def explore_dbfs_path(path: str = "dbfs:/databricks-datasets/", recursive: bool 
             print(f"⚠️ Error accessing {current_path}: {e}")
 
     list_dir(path)
-    
+
     # Apply pagination
     if offset > 0:
         discovered = discovered[offset:]
-    
+
     if limit is not None:
         discovered = discovered[:limit]
-    
+
     return discovered
 
 
@@ -61,28 +67,17 @@ def main():
         "--path",
         type=str,
         default="dbfs:/databricks-datasets/",
-        help="Root DBFS path to explore (default: dbfs:/databricks-datasets/)"
+        help="Root DBFS path to explore (default: dbfs:/databricks-datasets/)",
     )
     parser.add_argument(
-        "--files-only",
-        action="store_true",
-        help="Only list files, exclude folders"
+        "--files-only", action="store_true", help="Only list files, exclude folders"
     )
     parser.add_argument(
-        "--no-recursive",
-        action="store_true",
-        help="Disable recursive traversal"
+        "--no-recursive", action="store_true", help="Disable recursive traversal"
     )
+    parser.add_argument("--limit", type=int, help="Maximum number of paths to return")
     parser.add_argument(
-        "--limit",
-        type=int,
-        help="Maximum number of paths to return"
-    )
-    parser.add_argument(
-        "--offset",
-        type=int,
-        default=0,
-        help="Number of paths to skip (for pagination)"
+        "--offset", type=int, default=0, help="Number of paths to skip (for pagination)"
     )
 
     args = parser.parse_args()

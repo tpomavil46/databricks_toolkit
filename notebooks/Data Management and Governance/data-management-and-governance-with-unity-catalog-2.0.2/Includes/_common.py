@@ -8,27 +8,32 @@ from databricks.sdk import WorkspaceClient
 from databricks.sdk.errors.platform import NotFound
 import pyspark.sql.functions as F
 
+
 class NestedNamespace:
 
     def __init__(self, dictionary: dict = None, prefix=None):
-        prefix = prefix + '.' if prefix else ''
-        self.__setattr_direct('dictionary', dictionary or dict())
-        self.__setattr_direct('prefix', prefix)
-        self.__setattr_direct('iterator', None)
+        prefix = prefix + "." if prefix else ""
+        self.__setattr_direct("dictionary", dictionary or dict())
+        self.__setattr_direct("prefix", prefix)
+        self.__setattr_direct("iterator", None)
 
     def __getattr__(self, name):
         name = self.prefix + name
-        return self.dictionary.get(name, NestedNamespace(dictionary=self.dictionary, prefix=name))
+        return self.dictionary.get(
+            name, NestedNamespace(dictionary=self.dictionary, prefix=name)
+        )
 
     def __setattr__(self, name, value):
         name = self.prefix + name
         self.dictionary[name] = value
 
         # since we've overwritten the node in the tree, prune branch by deleting any children/ancestors
-        name += '.'
-        children = [k for k in filter(lambda x: x.startswith(name), self.dictionary.keys())]
+        name += "."
+        children = [
+            k for k in filter(lambda x: x.startswith(name), self.dictionary.keys())
+        ]
         for k in children:
-            del(self.dictionary[k])
+            del self.dictionary[k]
 
     # bypass overridden behaviour to directly set attributes
     def __setattr_direct(self, name, value):
@@ -40,11 +45,8 @@ class NestedNamespace:
 
     def __iter__(self):
         self.__setattr_direct(
-            'iterator',
-            filter(
-                lambda x: x.startswith(self.prefix),
-                iter(self.dictionary)
-            )
+            "iterator",
+            filter(lambda x: x.startswith(self.prefix), iter(self.dictionary)),
         )
 
         return self
@@ -58,6 +60,7 @@ class NestedNamespace:
     def __setitem__(self, name, value):
         return self.__setattr__(name, value)
 
+
 class DBAcademyHelper(NestedNamespace):
 
     def __init__(self, **kwargs):
@@ -65,11 +68,13 @@ class DBAcademyHelper(NestedNamespace):
         self.workspace = WorkspaceClient()
 
         try:
-            default_catalog = self.workspace.settings.default_namespace.get().namespace.value
+            default_catalog = (
+                self.workspace.settings.default_namespace.get().namespace.value
+            )
         except:
-            default_catalog = 'dbacademy'
+            default_catalog = "dbacademy"
 
-        meta = f'{default_catalog}.ops.meta'
+        meta = f"{default_catalog}.ops.meta"
         catalog = None
         schema = None
 
@@ -79,25 +84,29 @@ class DBAcademyHelper(NestedNamespace):
         try:
             rows = spark.table(meta).collect()
         except Py4JJavaError:
-            raise Exception(f'Error accessing metadata table {meta}; are you using serverless or DBR >= 15.1?')
+            raise Exception(
+                f"Error accessing metadata table {meta}; are you using serverless or DBR >= 15.1?"
+            )
         except PySparkException:
-            raise Exception(f'Metadata table {meta} not found or accessible; are you running in a properly configured metastore?')
+            raise Exception(
+                f"Metadata table {meta} not found or accessible; are you running in a properly configured metastore?"
+            )
 
         # query the metadata table and populate self with key/values
         for row in rows:
-            setattr(self, row['key'], row['value'])
+            setattr(self, row["key"], row["value"])
 
-            if row['key'] == 'catalog_name':
-                catalog = row['value']
-            elif row['key'] == 'schema_name':
-                schema = row['value']
+            if row["key"] == "catalog_name":
+                catalog = row["value"]
+            elif row["key"] == "schema_name":
+                schema = row["value"]
 
         # set default catalog and schema according to metadata
         if catalog:
-            spark.sql(f'USE CATALOG {catalog}')
+            spark.sql(f"USE CATALOG {catalog}")
 
             if schema:
-                spark.sql(f'USE SCHEMA {schema}')
+                spark.sql(f"USE SCHEMA {schema}")
 
     # add an initializer. Initializers can be chained are are all called when DA.init() is called.
     # This pattern makes it easier to dynamically augment the class across cells or notebooks.
@@ -115,12 +124,12 @@ class DBAcademyHelper(NestedNamespace):
     @classmethod
     def add_init(cls, function_ref):
         try:
-            initializers = getattr(cls, '_initializers')
+            initializers = getattr(cls, "_initializers")
         except AttributeError:
             initializers = list()
 
         initializers += [function_ref]
-        setattr(cls, '_initializers', initializers)
+        setattr(cls, "_initializers", initializers)
         return function_ref
 
     # add a class method (aka "monkey patch"). This pattern makes it easier to dynamically augment the class
@@ -136,7 +145,7 @@ class DBAcademyHelper(NestedNamespace):
     #
     # Ultimately, the new method can be called from within notebook code:
     #   DA.method()
-    
+
     @classmethod
     def add_method(cls, function_ref):
         setattr(cls, function_ref.__name__, function_ref)
@@ -149,14 +158,14 @@ class DBAcademyHelper(NestedNamespace):
 
             if value and type(value) == str:
                 try:
-                    spark.conf.set(f'DA.{key}', value)
-                    spark.conf.set(f'da.{key}', value)
+                    spark.conf.set(f"DA.{key}", value)
+                    spark.conf.set(f"da.{key}", value)
                 except:
                     # fails on serverless
                     pass
 
         try:
-            for i in getattr(self.__class__, '_initializers'):
+            for i in getattr(self.__class__, "_initializers"):
                 i(self)
 
         except AttributeError:
@@ -166,17 +175,15 @@ class DBAcademyHelper(NestedNamespace):
         datasets = self.datasets
 
         for i in datasets:
-            catalog = datasets[i].split('.')[0]
-            description = spark.sql(
-                f'DESCRIBE CATALOG {catalog}'
-            ).where(
-                F.col('info_name') == 'Comment'
-            ).select(
-                'info_value'
-            ).collect(
-            )[0]['info_value']
+            catalog = datasets[i].split(".")[0]
+            description = (
+                spark.sql(f"DESCRIBE CATALOG {catalog}")
+                .where(F.col("info_name") == "Comment")
+                .select("info_value")
+                .collect()[0]["info_value"]
+            )
             print(description)
-    
+
     # Perform common lookups via the SDK. For example to find a structure's ID given a name. Example uses:
     # DA.workspace_find("catalogs", "main") -> return SDK structure representing catalog named "main"
     # DA.workspace_find("cluster_policies", "DBAcademy DLT") -> return structure representing named policy
@@ -188,11 +195,7 @@ class DBAcademyHelper(NestedNamespace):
     # DA. workspace_find('pipelines', pipeline_name, api='list_pipelines') -> returns structure representing
     # the named DLT pipeline
     def workspace_find(
-        self,
-        item_type: str,
-        value: str=None,
-        member: str='name',
-        api: str='list'
+        self, item_type: str, value: str = None, member: str = "name", api: str = "list"
     ):
         # locate the API (item type), then grab the "list" method
         method = getattr(getattr(self.workspace, item_type), api)
@@ -203,8 +206,7 @@ class DBAcademyHelper(NestedNamespace):
                 return item
 
     def unique_name(self, sep: str) -> str:
-        return self.pseudonym.replace(' ', sep)
-    
+        return self.pseudonym.replace(" ", sep)
 
     def display_config_values(self, config_values):
         """

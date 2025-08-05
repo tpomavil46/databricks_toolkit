@@ -3,10 +3,12 @@
 
 # COMMAND ----------
 
+
 def test_parameter_value():
-    dbutils.widgets.text(name='test_value', defaultValue='')
-    if dbutils.widgets.get('test_value') == "Succeed":
+    dbutils.widgets.text(name="test_value", defaultValue="")
+    if dbutils.widgets.get("test_value") == "Succeed":
         return True
     return False
+
 
 assert test_parameter_value() == True

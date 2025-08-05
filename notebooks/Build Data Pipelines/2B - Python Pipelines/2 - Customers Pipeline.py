@@ -14,7 +14,7 @@
 # MAGIC DLT Pipelines make it easy to combine multiple datasets into a single scalable workload using one or many notebooks.
 # MAGIC
 # MAGIC In the last notebook, we reviewed some of the basic functionalities of DLT syntax while processing data from cloud object storage through a series of queries to validate and enrich records at each step. This notebook similarly follows the medallion architecture, but introduces a number of new concepts.
-# MAGIC * Raw records represent change data capture (CDC) information about customers 
+# MAGIC * Raw records represent change data capture (CDC) information about customers
 # MAGIC * The bronze table again uses Auto Loader to ingest JSON data from cloud object storage
 # MAGIC * A table is defined to enforce constraints before passing records to the silver layer
 # MAGIC * **`dlt.apply_changes()`** is used to automatically process CDC data into the silver layer as a Type 1 <a href="https://en.wikipedia.org/wiki/Slowly_changing_dimension" target="_blank">slowly changing dimension (SCD) table</a>
@@ -54,21 +54,16 @@ source = spark.conf.get("source")
 
 # COMMAND ----------
 
-@dlt.table(
-    name = "customers_bronze",
-    comment = "Raw data from customers CDC feed"
-)
+
+@dlt.table(name="customers_bronze", comment="Raw data from customers CDC feed")
 def ingest_customers_cdc():
     return (
-        spark.readStream
-        .format("cloudFiles")
+        spark.readStream.format("cloudFiles")
         .option("cloudFiles.format", "json")
         .load(f"{source}/customers")
-        .select(
-            F.current_timestamp().alias("processing_time"),
-            "*"
-        )
+        .select(F.current_timestamp().alias("processing_time"), "*")
     )
+
 
 # COMMAND ----------
 
@@ -82,7 +77,7 @@ def ingest_customers_cdc():
 # MAGIC * Using a built-in SQL function in a constraint
 # MAGIC
 # MAGIC About the data source:
-# MAGIC * Data is a CDC feed that contains **`INSERT`**, **`UPDATE`**, and **`DELETE`** operations. 
+# MAGIC * Data is a CDC feed that contains **`INSERT`**, **`UPDATE`**, and **`DELETE`** operations.
 # MAGIC * Update and insert operations should contain valid entries for all fields.
 # MAGIC * Delete operations should contain **`NULL`** values for all fields other than the timestamp, **`customer_id`**, and operation fields.
 # MAGIC
@@ -104,25 +99,31 @@ def ingest_customers_cdc():
 
 # COMMAND ----------
 
+
 @dlt.table
 @dlt.expect_or_fail("valid_id", "customer_id IS NOT NULL")
 @dlt.expect_or_drop("valid_operation", "operation IS NOT NULL")
 @dlt.expect("valid_name", "name IS NOT NULL or operation = 'DELETE'")
-@dlt.expect("valid_adress", """
+@dlt.expect(
+    "valid_adress",
+    """
     (address IS NOT NULL and 
     city IS NOT NULL and 
     state IS NOT NULL and 
     zip_code IS NOT NULL) or
     operation = "DELETE"
-    """)
-@dlt.expect_or_drop("valid_email", """
+    """,
+)
+@dlt.expect_or_drop(
+    "valid_email",
+    """
     rlike(email, '^([a-zA-Z0-9_\\\\-\\\\.]+)@([a-zA-Z0-9_\\\\-\\\\.]+)\\\\.([a-zA-Z]{2,5})$') or 
     operation = "DELETE"
-    """)
+    """,
+)
 def customers_bronze_clean():
-    return (
-        dlt.read_stream("customers_bronze")
-    )
+    return dlt.read_stream("customers_bronze")
+
 
 # COMMAND ----------
 
@@ -151,16 +152,16 @@ def customers_bronze_clean():
 
 # COMMAND ----------
 
-dlt.create_target_table(
-    name = "customers_silver")
+dlt.create_target_table(name="customers_silver")
 
 dlt.apply_changes(
-    target = "customers_silver",
-    source = "customers_bronze_clean",
-    keys = ["customer_id"],
-    sequence_by = F.col("timestamp"),
-    apply_as_deletes = F.expr("operation = 'DELETE'"),
-    except_column_list = ["operation", "_rescued_data"])
+    target="customers_silver",
+    source="customers_bronze_clean",
+    keys=["customer_id"],
+    sequence_by=F.col("timestamp"),
+    apply_as_deletes=F.expr("operation = 'DELETE'"),
+    except_column_list=["operation", "_rescued_data"],
+)
 
 # COMMAND ----------
 
@@ -169,7 +170,7 @@ dlt.apply_changes(
 # MAGIC
 # MAGIC **`dlt.apply_changes()`** defaults to creating a Type 1 SCD table, meaning that each unique key will have at most 1 record and that updates will overwrite the original information.
 # MAGIC
-# MAGIC While the target of our operation in the previous cell was defined as a streaming table, data is being updated and deleted in this table (and so breaks the append-only requirements for streaming table sources). As such, downstream operations cannot perform streaming queries against this table. 
+# MAGIC While the target of our operation in the previous cell was defined as a streaming table, data is being updated and deleted in this table (and so breaks the append-only requirements for streaming table sources). As such, downstream operations cannot perform streaming queries against this table.
 # MAGIC
 # MAGIC This pattern ensures that if any updates arrive out of order, downstream results can be properly recomputed to reflect updates. It also ensures that when records are deleted from a source table, these values are no longer reflected in tables later in the pipeline.
 # MAGIC
@@ -177,17 +178,18 @@ dlt.apply_changes(
 
 # COMMAND ----------
 
-@dlt.table(
-    comment="Total active customers per state")
+
+@dlt.table(comment="Total active customers per state")
 def customer_counts_state():
     return (
         dlt.read("customers_silver")
-            .groupBy("state")
-            .agg( 
-                F.count("*").alias("customer_count"), 
-                F.first(F.current_timestamp()).alias("updated_at")
-            )
+        .groupBy("state")
+        .agg(
+            F.count("*").alias("customer_count"),
+            F.first(F.current_timestamp()).alias("updated_at"),
+        )
     )
+
 
 # COMMAND ----------
 
@@ -218,19 +220,17 @@ def customer_counts_state():
 
 # COMMAND ----------
 
+
 @dlt.view
 def subscribed_order_emails_v():
     return (
-        dlt.read("orders_silver").filter("notifications = 'Y'").alias("a")
-            .join(
-                dlt.read("customers_silver").alias("b"), 
-                on="customer_id"
-            ).select(
-                "a.customer_id", 
-                "a.order_id", 
-                "b.email"
-            )
+        dlt.read("orders_silver")
+        .filter("notifications = 'Y'")
+        .alias("a")
+        .join(dlt.read("customers_silver").alias("b"), on="customer_id")
+        .select("a.customer_id", "a.order_id", "b.email")
     )
+
 
 # COMMAND ----------
 
@@ -268,8 +268,8 @@ def subscribed_order_emails_v():
 # MAGIC %md
 # MAGIC
 # MAGIC &copy; 2025 Databricks, Inc. All rights reserved.<br/>
-# MAGIC Apache, Apache Spark, Spark and the Spark logo are trademarks of the 
+# MAGIC Apache, Apache Spark, Spark and the Spark logo are trademarks of the
 # MAGIC <a href="https://www.apache.org/">Apache Software Foundation</a>.<br/>
-# MAGIC <br/><a href="https://databricks.com/privacy-policy">Privacy Policy</a> | 
-# MAGIC <a href="https://databricks.com/terms-of-use">Terms of Use</a> | 
+# MAGIC <br/><a href="https://databricks.com/privacy-policy">Privacy Policy</a> |
+# MAGIC <a href="https://databricks.com/terms-of-use">Terms of Use</a> |
 # MAGIC <a href="https://help.databricks.com/">Support</a>

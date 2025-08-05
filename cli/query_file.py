@@ -38,9 +38,21 @@ def query_file(path: str, fmt: str, limit: int) -> DataFrame:
 @log_function_call
 def main():
     parser = argparse.ArgumentParser(description="Query files in DBFS with SQL.")
-    parser.add_argument("--path", required=True, type=str, help="DBFS path to the file or directory.")
-    parser.add_argument("--format", required=True, type=str, help="File format (e.g., parquet, csv, json, delta).")
-    parser.add_argument("--limit", required=True, type=int, help="Number of rows to return (LIMIT clause).")
+    parser.add_argument(
+        "--path", required=True, type=str, help="DBFS path to the file or directory."
+    )
+    parser.add_argument(
+        "--format",
+        required=True,
+        type=str,
+        help="File format (e.g., parquet, csv, json, delta).",
+    )
+    parser.add_argument(
+        "--limit",
+        required=True,
+        type=int,
+        help="Number of rows to return (LIMIT clause).",
+    )
 
     args = parser.parse_args()
     df = query_file(path=args.path, fmt=args.format, limit=args.limit)
