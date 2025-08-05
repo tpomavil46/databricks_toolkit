@@ -1,64 +1,105 @@
-# main.py
+#!/usr/bin/env python3
+"""
+Databricks Toolkit - Main Entry Point
 
-import argparse
-import os
-from databricks.connect import DatabricksSession
-from pipelines.default_pipeline import run  # use your central orchestrator
-from dotenv import load_dotenv
-from utils.logger import log_function_call
+This is the unified entry point for the Databricks Toolkit.
+It provides access to both SQL-driven and PySpark ETL workflows.
+"""
+
 import sys
+import argparse
+from pathlib import Path
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Add the project root to the path
+project_root = Path(__file__).parent
+sys.path.insert(0, str(project_root))
 
-# Load .env for DATABRICKS_PROFILE and DATABRICKS_CLUSTER_ID
-load_dotenv()
+
+def run_sql_workflow(project: str, environment: str = "dev"):
+    """Run the SQL-driven workflow."""
+    from workflows.sql_driven.run import run_sql_pipeline
+    run_sql_pipeline(project, environment)
 
 
-@log_function_call
+def run_pyspark_workflow(pipeline: str, environment: str = "dev"):
+    """Run the PySpark ETL workflow."""
+    from workflows.pyspark_etl.run import run_pyspark_pipeline
+    run_pyspark_pipeline(pipeline, environment)
+
+
+def list_workflows():
+    """List available workflows and their components."""
+    print("=" * 60)
+    print("🔧 DATABRICKS TOOLKIT - AVAILABLE WORKFLOWS")
+    print("=" * 60)
+    
+    print("\n📊 SQL-DRIVEN WORKFLOW")
+    print("   Purpose: SQL-first data processing")
+    print("   Usage: python main.py sql <project> [--environment]")
+    print("   Examples:")
+    print("     python main.py sql retail")
+    print("     python main.py sql ecommerce --environment prod")
+    
+    print("\n🔧 PYSPARK ETL WORKFLOW")
+    print("   Purpose: Python-first ETL processing")
+    print("   Usage: python main.py pyspark <pipeline> [--environment]")
+    print("   Examples:")
+    print("     python main.py pyspark data_ingestion")
+    print("     python main.py pyspark transformation --environment staging")
+    
+    print("\n📚 SHARED COMPONENTS")
+    print("   CLI Tools: python -m shared.cli")
+    print("   Admin Tools: python -m shared.admin")
+    print("   SQL Library: python -m shared.sql_library")
+
+
 def main():
-    parser = argparse.ArgumentParser(description="Run the full Medallion pipeline")
-
-    parser.add_argument(
-        "--input_table",
-        type=str,
-        required=True,
-        help="Input path or table (CSV or similar)",
+    """Main entry point with workflow selection."""
+    parser = argparse.ArgumentParser(
+        description="Databricks Toolkit - Unified Entry Point",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python main.py sql retail                    # Run SQL workflow for retail project
+  python main.py pyspark data_ingestion       # Run PySpark ETL workflow
+  python main.py list                         # List available workflows
+        """
     )
-    parser.add_argument(
-        "--bronze_path", type=str, required=True, help="Target Bronze table name"
-    )
-    parser.add_argument(
-        "--silver_path", type=str, required=True, help="Target Silver table name"
-    )
-    parser.add_argument(
-        "--gold_path", type=str, required=True, help="Target Gold base name"
-    )
-    parser.add_argument(
-        "--format", type=str, default="delta", help="Storage format (default: delta)"
-    )
-    parser.add_argument(
-        "--view_or_table",
-        type=str,
-        default="view",
-        help="Gold output type: 'view' or 'table'",
-    )
-    parser.add_argument(
-        "--vendor_filter",
-        type=int,
-        default=None,
-        help="Optional vendor ID filter for Gold view",
-    )
-
+    
+    parser.add_argument("workflow", nargs="?", choices=["sql", "pyspark", "list"],
+                       help="Workflow to run (sql, pyspark, or list)")
+    parser.add_argument("target", nargs="?", help="Project or pipeline name")
+    parser.add_argument("--environment", "-e", default="dev",
+                       choices=["dev", "staging", "prod"],
+                       help="Environment to run in")
+    
     args = parser.parse_args()
-
-    # Create Spark session via Databricks Connect
-    spark = (
-        DatabricksSession.builder.profile(os.getenv("DATABRICKS_PROFILE"))
-        .clusterId(os.getenv("DATABRICKS_CLUSTER_ID"))
-        .getOrCreate()
-    )
-
-    run(spark, **vars(args))
+    
+    if args.workflow == "list" or not args.workflow:
+        list_workflows()
+        return
+    
+    if not args.target:
+        print("❌ Error: Please specify a project/pipeline name")
+        print("   Example: python main.py sql retail")
+        sys.exit(1)
+    
+    print("=" * 60)
+    print("🚀 DATABRICKS TOOLKIT")
+    print("=" * 60)
+    
+    try:
+        if args.workflow == "sql":
+            run_sql_workflow(args.target, args.environment)
+        elif args.workflow == "pyspark":
+            run_pyspark_workflow(args.target, args.environment)
+        else:
+            print(f"❌ Unknown workflow: {args.workflow}")
+            sys.exit(1)
+            
+    except Exception as e:
+        print(f"❌ Error running workflow: {e}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

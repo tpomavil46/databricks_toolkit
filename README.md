@@ -1,231 +1,344 @@
 # Databricks Toolkit
 
-A comprehensive toolkit for building data pipelines with loose coupling between SQL and Python, following the Medallion Architecture.
+A comprehensive toolkit for Databricks development with support for both SQL-driven and PySpark ETL workflows.
 
-## 🎯 Overview
+## 🏗️ Architecture
 
-This toolkit provides:
-- **Exploratory Data Analysis (EDA)** tools for understanding your data
-- **Bronze Layer Ingestion** for raw data ingestion
-- **SQL-Driven Pipelines** with loose coupling between SQL and Python
-- **Project Organization** for multiple domains (retail, ecommerce, healthcare)
-- **Reusable Framework** for easy pipeline generation
-
-## 🚀 Quick Start
-
-### 1. Data Discovery & Exploration
-
-```bash
-# List available datasets
-make run JOB=find_datasets
-
-# Explore a specific dataset
-DATASET_PATH="dbfs:/databricks-datasets/retail-org/customers/" \
-DATASET_NAME="Retail Customers" \
-make run JOB=data_explorer
-```
-
-### 2. Bronze Layer Ingestion
-
-```bash
-# Create bronze table from raw data
-make run JOB=bronze_ingestion \
-  --source_path="dbfs:/databricks-datasets/retail-org/customers/" \
-  --bronze_table_name="retail_customers_bronze" \
-  --project_name="retail"
-```
-
-### 3. Run Pipelines
-
-```bash
-# Retail pipeline
-make run JOB=retail_pipeline
-
-# Ecommerce pipeline (with DBFS data)
-make run JOB=dbfs_ecommerce_ingestion
-make run JOB=ecommerce_pipeline
-
-# Healthcare pipeline (with DBFS data)
-make run JOB=dbfs_healthcare_ingestion
-make run JOB=healthcare_pipeline
-```
-
-## 📁 Project Structure
+The toolkit is organized into clear, separate workflows to make navigation and understanding easy:
 
 ```
 databricks_toolkit/
-├── eda/                          # Exploratory Data Analysis
-│   ├── data_explorer.py          # Comprehensive data exploration
-│   ├── bronze_ingestion.py       # Bronze layer ingestion
-│   └── README.md                 # EDA workflow guide
-├── pipelines/                    # Pipeline implementations
-│   ├── sql_driven_pipeline.py   # Core framework class
-│   ├── retail_pipeline.py       # Retail domain pipeline
-│   ├── ecommerce_pipeline.py    # Ecommerce domain pipeline
-│   └── healthcare_pipeline.py   # Healthcare domain pipeline
-├── sql/                         # SQL files organized by project
-│   ├── bronze/retail/           # Retail bronze layer SQL
-│   ├── silver/retail/           # Retail silver layer SQL
-│   ├── gold/retail/             # Retail gold layer SQL
-│   ├── bronze/ecommerce/        # Ecommerce bronze layer SQL
-│   ├── silver/ecommerce/        # Ecommerce silver layer SQL
-│   ├── gold/ecommerce/          # Ecommerce gold layer SQL
-│   ├── bronze/healthcare/       # Healthcare bronze layer SQL
-│   ├── silver/healthcare/       # Healthcare silver layer SQL
-│   └── gold/healthcare/         # Healthcare gold layer SQL
-├── core/                        # Core framework components
-├── utils/                       # Utility functions
-└── local_runner.py              # Pipeline execution runner
+├── workflows/                    # 🎯 CLEAR WORKFLOW SEPARATION
+│   ├── sql_driven/             # SQL-First Workflow
+│   │   ├── README.md           # SQL workflow documentation
+│   │   ├── run.py              # SQL workflow runner
+│   │   ├── pipelines/          # SQL-driven pipelines
+│   │   ├── sql/                # SQL templates and queries
+│   │   ├── config/             # SQL workflow configuration
+│   │   └── examples/           # SQL workflow examples
+│   │
+│   └── pyspark_etl/            # PySpark ETL Workflow
+│       ├── README.md           # PySpark workflow documentation
+│       ├── run.py              # PySpark workflow runner
+│       ├── pipelines/          # PySpark ETL pipelines
+│       ├── transformations/    # PySpark transformations
+│       ├── config/             # PySpark workflow configuration
+│       └── examples/           # PySpark workflow examples
+│
+├── shared/                      # 🔧 SHARED COMPONENTS
+│   ├── cli/                    # Command-line tools
+│   ├── admin/                  # Administrative tools
+│   ├── utils/                  # Shared utilities
+│   ├── sql_library/            # SQL library components
+│   └── bootstrap/              # Bootstrap tools
+│
+├── config/                      # ⚙️ GLOBAL CONFIGURATION
+│   ├── environments/           # Environment configs
+│   ├── jobs/                   # Job configurations
+│   └── templates/              # Configuration templates
+│
+├── tests/                       # 🧪 COMPREHENSIVE TESTING
+│   ├── unit/                   # Unit tests
+│   ├── integration/            # Integration tests
+│   └── ci/                     # CI-specific tests
+│
+├── tools/                       # 🛠️ UTILITY TOOLS
+│   ├── create_test_data.py     # Test data generation
+│   ├── check_tables.py         # Table inspection
+│   ├── find_datasets.py        # Dataset discovery
+│   └── test_sql_library.py    # SQL library testing
+│
+└── docs/                       # 📚 DOCUMENTATION
+    ├── getting_started.md
+    ├── workflows/
+    └── examples/
 ```
 
-## 🔍 EDA Workflow
+## 🚀 Quick Start
 
-### Step 1: Data Discovery
+### Choose Your Workflow
+
+**SQL-Driven Workflow** - For SQL-first development:
 ```bash
-# Find available datasets
-make run JOB=find_datasets
+# Run SQL workflow for retail project
+python main.py sql retail
+
+# Run with specific environment
+python main.py sql ecommerce --environment prod
 ```
 
-### Step 2: Data Exploration
+**PySpark ETL Workflow** - For Python-first development:
 ```bash
-# Explore dataset structure and quality
-DATASET_PATH="your_dataset_path" \
-DATASET_NAME="Your Dataset Name" \
-make run JOB=data_explorer
+# Run PySpark ETL workflow
+python main.py pyspark data_ingestion
+
+# Run with specific environment
+python main.py pyspark transformation --environment staging
 ```
 
-**What you'll get:**
-- 📊 Basic information (rows, columns, data types)
-- 📋 Detailed schema analysis
-- 🔍 Data quality metrics (nulls, distinct values, empty strings)
-- 📄 Sample data (first and last 5 rows)
-- 📈 Statistical summary for numeric columns
-- 🔬 Column-by-column analysis
-
-### Step 3: Bronze Ingestion
+**List Available Workflows**:
 ```bash
-# Create bronze table from raw data
-make run JOB=bronze_ingestion \
-  --source_path="your_source_path" \
-  --bronze_table_name="your_bronze_table" \
-  --project_name="your_project"
+python main.py list
 ```
 
-## 🏗️ Pipeline Framework
+## 📊 Workflow Comparison
 
-### Core Features
+| Feature | SQL-Driven | PySpark ETL |
+|---------|------------|--------------|
+| **Primary Language** | SQL | Python |
+| **Best For** | SQL-first teams | Python-first teams |
+| **Complexity** | Simple to moderate | Moderate to complex |
+| **Performance** | Optimized SQL engine | Custom optimizations |
+| **Maintenance** | SQL files | Python classes |
+| **Extensibility** | SQL templates | Python inheritance |
 
-1. **Loose Coupling**: SQL separated from Python orchestration
-2. **Reusable Framework**: Same `SQLDrivenPipeline` class works for all projects
-3. **Project Organization**: Dedicated pipelines in `pipelines/` folder
-4. **Dynamic SQL Mapping**: Each project has its own SQL file names
-5. **Multiple Data Sources**: Real DBFS data transformed for different domains
+## 🔧 Key Features
 
-### Available Pipelines
+### ✅ **Clear Separation**
+- **SQL-Driven Workflow**: SQL-first data processing
+- **PySpark ETL Workflow**: Python-first ETL processing
+- **Shared Components**: Reusable across both workflows
 
+### ✅ **Easy Navigation**
+- Clear entry points for each workflow
+- Logical file organization
+- Comprehensive documentation
+
+### ✅ **Maintainable**
+- Loose coupling between workflows
+- Shared components reduce duplication
+- Clear configuration management
+
+### ✅ **Scalable**
+- Easy to add new workflows
+- Consistent structure across components
+- Clear extension points
+
+## 🛠️ Installation
+
+1. **Clone the repository**:
 ```bash
-# Retail Pipeline (with existing retail_customers_bronze)
-make run JOB=retail_pipeline
-
-# Ecommerce Pipeline (with DBFS data)
-make run JOB=dbfs_ecommerce_ingestion  # Create data from DBFS
-make run JOB=ecommerce_pipeline         # Run pipeline
-
-# Healthcare Pipeline (with DBFS data)
-make run JOB=dbfs_healthcare_ingestion  # Create data from DBFS
-make run JOB=healthcare_pipeline        # Run pipeline
+git clone <repository-url>
+cd databricks_toolkit
 ```
 
-## 📊 Understanding Your Data
+2. **Set up virtual environment**:
+```bash
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+```
 
-After running EDA, you should understand:
+3. **Install dependencies**:
+```bash
+pip install -r requirements.txt
+```
 
-### 1. **Data Structure**
-- What columns are available?
-- What are the data types?
-- How many rows and columns?
+4. **Configure Databricks connection**:
+```bash
+# Set up your .databrickscfg file
+databricks configure --profile your-profile
+```
 
-### 2. **Data Quality**
-- Are there missing values (nulls)?
-- Are there empty strings?
-- How many distinct values per column?
-- Are there data type issues?
+## 📋 Prerequisites
 
-### 3. **Data Distribution**
-- What are the most common values?
-- What's the range for numeric columns?
-- Are there outliers or anomalies?
+- Python 3.11+
+- Databricks workspace access
+- Databricks Connect configured
+- Valid Databricks cluster
 
-### 4. **Business Context**
-- What does each column represent?
-- What are the business rules?
-- What are the expected patterns?
+## 🔄 Usage Examples
 
-## 🎯 Next Steps
+### SQL-Driven Workflow
 
-After EDA, you're ready to:
+**Run a complete SQL pipeline**:
+```bash
+python main.py sql retail
+```
 
-1. **Design Silver Layer**
-   - Plan data cleaning and transformation
-   - Define business rules
-   - Create data quality checks
+**Run with custom environment**:
+```bash
+python main.py sql ecommerce --environment prod
+```
 
-2. **Design Gold Layer**
-   - Identify KPIs and metrics
-   - Plan aggregations and summaries
-   - Define end-user requirements
+**Direct workflow access**:
+```bash
+python workflows/sql_driven/run.py retail --environment staging
+```
 
-3. **Create SQL Files**
-   - Write bronze ingestion SQL
-   - Write silver transformation SQL
-   - Write gold KPI generation SQL
+### PySpark ETL Workflow
+
+**Run a PySpark ETL pipeline**:
+```bash
+python main.py pyspark data_ingestion
+```
+
+**Run with custom environment**:
+```bash
+python main.py pyspark transformation --environment prod
+```
+
+**Direct workflow access**:
+```bash
+python workflows/pyspark_etl/run.py data_ingestion --environment dev
+```
+
+### Shared Components
+
+**CLI Tools**:
+```bash
+# List DBFS contents
+python -m shared.cli.dbfs_cli list /path/to/data
+
+# Execute SQL file
+python -m shared.cli.query_file execute sql/bronze/retail/ingest_customers.sql
+```
+
+**Admin Tools**:
+```bash
+# List users
+python -m shared.admin.admin_cli list-users
+
+# Monitor clusters
+python -m shared.admin.admin_cli list-clusters
+```
+
+**SQL Library**:
+```bash
+# List SQL patterns
+python -m shared.sql_library.cli.sql_library_cli list-patterns
+
+# Generate SQL library
+python -m shared.sql_library.cli.sql_library_cli create-function-library
+```
+
+## 🧪 Testing
+
+**Run CI tests** (recommended for development):
+```bash
+make test-ci
+```
+
+**Run simple tests** (no external dependencies):
+```bash
+make test-simple
+```
+
+**Run all tests** (including integration tests):
+```bash
+make test
+```
+
+**Run linting**:
+```bash
+make lint
+```
 
 ## 📚 Documentation
 
-- [EDA Workflow Guide](eda/README.md) - Comprehensive EDA documentation
-- [SQL-Driven Pipeline Guide](README_SQL_DRIVEN.md) - Pipeline framework documentation
-- [Commands Reference](COMMANDS.md) - Available commands and examples
+- **[SQL-Driven Workflow](workflows/sql_driven/README.md)** - Complete SQL workflow guide
+- **[PySpark ETL Workflow](workflows/pyspark_etl/README.md)** - Complete PySpark ETL guide
+- **[CI Setup Guide](CI_SETUP.md)** - CI/CD configuration and testing
+- **[Commands Reference](COMMANDS.md)** - All available commands
+- **[TODO](TODO.md)** - Project roadmap and progress
 
-## 🔧 Customization
+## 🔧 Configuration
 
-### Adding New Projects
+### Environment Variables
 
-1. Create SQL files in `sql/bronze/your_project/`, `sql/silver/your_project/`, `sql/gold/your_project/`
-2. Create pipeline file in `pipelines/your_project_pipeline.py`
-3. Update `SQLDrivenPipeline` class with your project's SQL file names
+```bash
+# Required
+export DATABRICKS_PROFILE="your-profile"
+export DATABRICKS_CLUSTER_ID="your-cluster-id"
 
-### Adding New Data Sources
+# Optional
+export DATABRICKS_CATALOG="your-catalog"
+export DATABRICKS_SCHEMA="your-schema"
+```
 
-To explore custom data sources:
-1. **DBFS Files**: Use `dbfs:/your/path/`
-2. **Tables**: Use table name directly
-3. **External Sources**: Modify the `_load_dataset` method in `data_explorer.py`
+### Configuration Files
 
-## 📝 Best Practices
+- **Environment configs**: `config/environments/`
+- **Job configs**: `config/jobs/`
+- **Pipeline configs**: `workflows/*/config/`
 
-1. **Always explore before ingesting** - Understand your data first
-2. **Document your findings** - Keep notes on data quality issues
-3. **Plan your transformations** - Know what you'll do in silver layer
-4. **Consider business context** - Understand what the data represents
-5. **Check data quality** - Look for nulls, duplicates, anomalies
+## 🏗️ Development
 
-## 🆘 Troubleshooting
+### Project Structure
+
+The toolkit follows a clear, organized structure:
+
+1. **Workflows** - Separate SQL and PySpark ETL workflows
+2. **Shared Components** - Reusable tools and utilities
+3. **Configuration** - Environment and job configurations
+4. **Testing** - Comprehensive test suites
+5. **Documentation** - Complete guides and references
+
+### Adding New Workflows
+
+1. Create new workflow directory in `workflows/`
+2. Add workflow runner (`run.py`)
+3. Create workflow documentation (`README.md`)
+4. Add configuration files
+5. Update main entry point (`main.py`)
+
+### Best Practices
+
+1. **Use appropriate workflow** for your use case
+2. **Follow naming conventions** for files and directories
+3. **Add tests** for new functionality
+4. **Update documentation** when adding features
+5. **Use shared components** when possible
+
+## 🤝 Contributing
+
+1. **Choose your workflow** (SQL or PySpark ETL)
+2. **Follow the structure** of existing components
+3. **Add tests** for new functionality
+4. **Update documentation** for changes
+5. **Use shared components** when possible
+
+## 📈 Roadmap
+
+### Phase 1: Core Workflows ✅
+- [x] SQL-driven workflow
+- [x] PySpark ETL workflow
+- [x] Shared components
+- [x] Basic documentation
+
+### Phase 2: Advanced Features 🚧
+- [ ] Advanced data quality checks
+- [ ] Performance monitoring
+- [ ] ML pipeline integration
+- [ ] Real-time processing
+
+### Phase 3: Enterprise Features 📋
+- [ ] Multi-tenant support
+- [ ] Advanced security
+- [ ] Compliance features
+- [ ] Enterprise monitoring
+
+## 🐛 Troubleshooting
 
 ### Common Issues
 
-1. **Dataset not found**: Check the path and format
-2. **Permission errors**: Verify DBFS access
-3. **Schema conflicts**: Drop existing tables if needed
-4. **Memory issues**: Use smaller sample for large datasets
+1. **Import Errors**: Check Python path and virtual environment
+2. **Connection Issues**: Verify Databricks credentials and cluster status
+3. **Permission Errors**: Check workspace permissions and cluster access
+4. **Performance Issues**: Monitor Spark UI and optimize configurations
 
 ### Getting Help
 
-- Check the dataset path exists: `make run JOB=find_datasets`
-- Try different file formats (CSV, Parquet, Delta, JSON)
-- Verify your Databricks connection: `databricks-connect test`
+1. Check the [documentation](docs/)
+2. Review [troubleshooting guides](docs/troubleshooting.md)
+3. Run tests to identify issues
+4. Check logs for detailed error messages
 
-## 📚 Additional Resources
+## 📄 License
 
-- [Databricks Documentation](https://docs.databricks.com/)
-- [Spark SQL Reference](https://spark.apache.org/docs/latest/sql-programming-guide.html)
-- [Delta Lake Documentation](https://docs.delta.io/)
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+**For detailed workflow documentation, see:**
+- [SQL-Driven Workflow](workflows/sql_driven/README.md)
+- [PySpark ETL Workflow](workflows/pyspark_etl/README.md)
