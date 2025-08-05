@@ -66,3 +66,34 @@ def get_column_mapping(dataset: str) -> dict:
         }
     else:
         raise ValueError(f"Unknown dataset for column mapping: {dataset}")
+
+
+@log_function_call
+def flatten_struct(df, column_name: str):
+    """
+    Flattens a struct column in a DataFrame by expanding its nested fields.
+    
+    Args:
+        df: PySpark DataFrame
+        column_name (str): Name of the struct column to flatten
+        
+    Returns:
+        DataFrame: DataFrame with flattened struct column
+    """
+    from pyspark.sql.functions import col
+    
+    # Get the struct schema
+    struct_schema = df.schema[column_name].dataType
+    
+    # Create select expressions for all fields in the struct
+    select_exprs = []
+    for field in struct_schema.fields:
+        field_name = field.name
+        select_exprs.append(col(f"{column_name}.{field_name}").alias(f"{column_name}_{field_name}"))
+    
+    # Add all other columns
+    for col_name in df.columns:
+        if col_name != column_name:
+            select_exprs.append(col(col_name))
+    
+    return df.select(*select_exprs)

@@ -129,3 +129,11 @@ run-generate-kpis-remote:
 	databricks jobs run-now \
 		--profile databricks \
 		--job-id $(JOB_ID)
+
+test-simple: ## Run simple tests (no external dependencies)
+	@echo "Running simple tests..."
+	PYTHONPATH=. python tests/run_simple_tests.py
+
+test-ci: ## Run CI tests (for GitHub Actions)
+	@echo "Running CI tests..."
+	PYTHONPATH=. python tests/run_ci_tests.py

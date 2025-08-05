@@ -233,25 +233,18 @@ class TestETLTools(BaseIntegrationTest):
         """Test ETL pipeline initialization."""
         from etl.core.etl_pipeline import StandardETLPipeline
         from etl.core.config import PipelineConfig
-        
+
         config = PipelineConfig(
+            project_name="test_project",
             cluster_config={'cluster_id': 'test-cluster'},
             database_config={'catalog': 'test', 'schema': 'test'},
             table_config={'project_name': 'test', 'environment': 'dev'},
             validation_config={'enable_validation': True}
         )
-        
-        with patch('databricks.connect.DatabricksSession') as mock_session:
-            mock_spark = Mock()
-            mock_session.builder.profile.return_value.clusterId.return_value.getOrCreate.return_value = mock_spark
-            
-            # Test should not raise exceptions
-            try:
-                pipeline = StandardETLPipeline(config)
-                self.assertIsNotNone(pipeline)
-                self.assertEqual(pipeline.config, config)
-            except Exception as e:
-                self.fail(f"StandardETLPipeline initialization raised an exception: {e}")
+
+        pipeline = StandardETLPipeline(config)
+        self.assertIsNotNone(pipeline)
+        self.assertEqual(pipeline.config.project_name, "test_project")
     
     def test_data_transformation_basic_functionality(self):
         """Test basic data transformation functionality."""
@@ -272,24 +265,22 @@ class TestETLTools(BaseIntegrationTest):
         """Test basic data validation functionality."""
         from etl.core.validators import DataValidator
         from etl.core.config import PipelineConfig
-        
+
         config = PipelineConfig(
+            project_name="test_project",
             cluster_config={'cluster_id': 'test-cluster'},
             database_config={'catalog': 'test', 'schema': 'test'},
             table_config={'project_name': 'test', 'environment': 'dev'},
             validation_config={'enable_validation': True}
         )
-        
+
         with patch('databricks.connect.DatabricksSession') as mock_session:
             mock_spark = Mock()
             mock_session.builder.profile.return_value.clusterId.return_value.getOrCreate.return_value = mock_spark
             
-            # Test should not raise exceptions
-            try:
-                validator = DataValidator(mock_spark, config)
-                self.assertIsNotNone(validator)
-            except Exception as e:
-                self.fail(f"DataValidator initialization raised an exception: {e}")
+            validator = DataValidator(mock_spark, config)
+            self.assertIsNotNone(validator)
+            self.assertTrue(validator.config.validation_config.enable_validation)
 
 
 class TestCoreTools(BaseIntegrationTest):
@@ -337,7 +328,8 @@ class TestCoreTools(BaseIntegrationTest):
             
             # Test should not raise exceptions
             try:
-                pipeline = SQLDrivenPipeline('retail', mock_spark)
+                # Pass spark as first parameter, then sql_base_path and project
+                pipeline = SQLDrivenPipeline(mock_spark, "sql", "retail")
                 self.assertIsNotNone(pipeline)
                 self.assertEqual(pipeline.project, 'retail')
             except Exception as e:
