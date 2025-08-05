@@ -81,6 +81,57 @@ python main.py pyspark transformation --environment staging
 python main.py list
 ```
 
+## 🛠️ Commands Reference
+
+### Development & Testing
+
+| Command | Description |
+|---------|-------------|
+| `make test` | Run unit tests using pytest |
+| `make test-integration` | Run integration tests |
+| `make lint` | Run flake8 for code linting |
+| `make format` | Run black to auto-format Python files |
+| `make sync` | Sync GitHub → Databricks Repos |
+
+### Local Execution
+
+| Command | Description |
+|---------|-------------|
+| `python main.py sql <project>` | Run SQL workflow locally |
+| `python main.py pyspark <pipeline>` | Run PySpark ETL workflow locally |
+| `python tools/create_test_data.py` | Generate test data |
+| `python tools/check_tables.py` | Check available tables |
+| `python tools/find_datasets.py` | Find available datasets |
+
+### Deployment & Remote Execution
+
+| Command | Description |
+|---------|-------------|
+| `make deploy-ingest` | Deploy ingest job to Databricks |
+| `make run-ingest-remote JOB_ID=<id>` | Run ingest job remotely |
+| `make deploy-transform` | Deploy transform job to Databricks |
+| `make run-transform-remote JOB_ID=<id>` | Run transform job remotely |
+| `make deploy-pipeline` | Deploy multi-task pipeline |
+| `make run-pipeline-remote JOB_ID=<id>` | Run pipeline remotely |
+| `make clean-remote JOB_ID=<id>` | Delete remote job |
+
+### Job Management
+
+| Command | Description |
+|---------|-------------|
+| `make generate-job JOB=<job_name>` | Generate job JSON spec |
+| `databricks jobs list` | List all jobs in workspace |
+| `databricks runs list --job-id <id>` | List runs for a job |
+| `databricks runs get --run-id <id>` | Get run status |
+
+### Databricks CLI Commands
+
+| Command | Description |
+|---------|-------------|
+| `databricks clusters list` | List available clusters |
+| `databricks fs ls dbfs:/...` | List files in DBFS |
+| `databricks repos update --path "/Repos/..."` | Update repository |
+
 ## 📊 Workflow Comparison
 
 | Feature | SQL-Driven | PySpark ETL |
@@ -238,8 +289,8 @@ make lint
 - **[SQL-Driven Workflow](workflows/sql_driven/README.md)** - Complete SQL workflow guide
 - **[PySpark ETL Workflow](workflows/pyspark_etl/README.md)** - Complete PySpark ETL guide
 - **[CI Setup Guide](CI_SETUP.md)** - CI/CD configuration and testing
-- **[Commands Reference](COMMANDS.md)** - All available commands
-- **[TODO](TODO.md)** - Project roadmap and progress
+- **Commands Reference** - See the Commands Reference section above
+- **[Roadmap](ROADMAP.md)** - Project roadmap and future enhancements
 
 ## 🔧 Configuration
 
@@ -299,23 +350,25 @@ The toolkit follows a clear, organized structure:
 
 ## 📈 Roadmap
 
-### Phase 1: Core Workflows ✅
-- [x] SQL-driven workflow
-- [x] PySpark ETL workflow
-- [x] Shared components
-- [x] Basic documentation
+The Databricks Toolkit has completed its core development phases and is now production-ready. For detailed information about completed work and future enhancements, see the **[Roadmap](ROADMAP.md)**.
 
-### Phase 2: Advanced Features 🚧
-- [ ] Advanced data quality checks
-- [ ] Performance monitoring
-- [ ] ML pipeline integration
-- [ ] Real-time processing
+### ✅ **Completed Phases**
+- **Phase 1**: Core Workflows (SQL-driven and PySpark ETL)
+- **Phase 2**: SQL Library Framework
+- **Phase 3**: Administrative Tools
+- **Phase 4**: Enhanced CLI Toolkit
+- **Phase 5**: Testing & Quality Assurance
 
-### Phase 3: Enterprise Features 📋
-- [ ] Multi-tenant support
-- [ ] Advanced security
-- [ ] Compliance features
-- [ ] Enterprise monitoring
+### 🚀 **Current Status**
+- **Production Ready** with comprehensive testing
+- **Enterprise Features** with administrative tools
+- **Professional CLI** with monitoring capabilities
+- **Complete Documentation** with usage examples
+
+### 🎯 **Future Enhancements**
+- **Phase 6**: Advanced Features (ML, Streaming, Data Quality)
+- **Phase 7**: Enterprise Features (Multi-tenant, Security, Performance)
+- **Phase 8**: Developer Experience (IDE Integration, Training)
 
 ## 🐛 Troubleshooting
 
