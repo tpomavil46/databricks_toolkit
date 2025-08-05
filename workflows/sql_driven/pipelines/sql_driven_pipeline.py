@@ -16,7 +16,7 @@ from typing import Dict, Any, Optional
 from pathlib import Path
 
 from core.sql_pipeline_executor import SQLPipelineExecutor, SQLPipelineBuilder
-from utils.logger import log_function_call
+from shared.utils.logger import log_function_call
 
 
 class SQLDrivenPipeline:

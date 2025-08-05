@@ -1,0 +1,231 @@
+{
+  "data_sources": {
+    "retail": {
+      "name": "Retail Analytics",
+      "description": "E-commerce and retail data analytics",
+      "cloud_providers": [
+        "databricks",
+        "gcp"
+      ],
+      "metrics": [
+        "revenue",
+        "products",
+        "customers",
+        "cost"
+      ],
+      "tables": [
+        "orders",
+        "customers",
+        "products",
+        "inventory"
+      ],
+      "color_scheme": "retail"
+    },
+    "healthcare": {
+      "name": "Healthcare Analytics",
+      "description": "Patient and medical data analytics",
+      "cloud_providers": [
+        "databricks",
+        "gcp",
+        "aws"
+      ],
+      "metrics": [
+        "patients",
+        "treatments",
+        "costs",
+        "outcomes"
+      ],
+      "tables": [
+        "patients",
+        "treatments",
+        "medications",
+        "billing"
+      ],
+      "color_scheme": "healthcare"
+    },
+    "finance": {
+      "name": "Financial Analytics",
+      "description": "Banking and financial data analytics",
+      "cloud_providers": [
+        "databricks",
+        "gcp",
+        "azure"
+      ],
+      "metrics": [
+        "transactions",
+        "revenue",
+        "risk",
+        "compliance"
+      ],
+      "tables": [
+        "transactions",
+        "accounts",
+        "risk_scores",
+        "compliance"
+      ],
+      "color_scheme": "finance"
+    },
+    "manufacturing": {
+      "name": "Manufacturing Analytics",
+      "description": "Industrial and manufacturing data analytics",
+      "cloud_providers": [
+        "databricks",
+        "aws",
+        "azure"
+      ],
+      "metrics": [
+        "production",
+        "quality",
+        "efficiency",
+        "cost"
+      ],
+      "tables": [
+        "production",
+        "quality",
+        "machines",
+        "maintenance"
+      ],
+      "color_scheme": "manufacturing"
+    },
+    "custom": {
+      "name": "Custom Analytics",
+      "description": "Custom data source configuration",
+      "cloud_providers": [
+        "databricks",
+        "gcp",
+        "aws",
+        "azure"
+      ],
+      "metrics": [
+        "custom_metric_1",
+        "custom_metric_2"
+      ],
+      "tables": [
+        "custom_table_1",
+        "custom_table_2"
+      ],
+      "color_scheme": "custom"
+    }
+  },
+  "cloud_providers": {
+    "databricks": {
+      "name": "Databricks",
+      "color": "#ff6b35",
+      "services": [
+        "compute",
+        "storage",
+        "analytics",
+        "ml"
+      ],
+      "cost_metrics": [
+        "dbu_hours",
+        "storage_gb",
+        "network_gb"
+      ],
+      "api_endpoint": "https://your-workspace.cloud.databricks.com",
+      "auth_method": "token"
+    },
+    "gcp": {
+      "name": "Google Cloud Platform",
+      "color": "#4285f4",
+      "services": [
+        "compute",
+        "storage",
+        "bigquery",
+        "dataproc"
+      ],
+      "cost_metrics": [
+        "compute_hours",
+        "storage_gb",
+        "network_gb"
+      ],
+      "api_endpoint": "https://bigquery.googleapis.com",
+      "auth_method": "service_account"
+    },
+    "aws": {
+      "name": "Amazon Web Services",
+      "color": "#ff9900",
+      "services": [
+        "ec2",
+        "s3",
+        "glue",
+        "emr"
+      ],
+      "cost_metrics": [
+        "compute_hours",
+        "storage_gb",
+        "network_gb"
+      ],
+      "api_endpoint": "https://aws.amazon.com",
+      "auth_method": "iam"
+    },
+    "azure": {
+      "name": "Microsoft Azure",
+      "color": "#0078d4",
+      "services": [
+        "compute",
+        "storage",
+        "synapse",
+        "databricks"
+      ],
+      "cost_metrics": [
+        "compute_hours",
+        "storage_gb",
+        "network_gb"
+      ],
+      "api_endpoint": "https://azure.microsoft.com",
+      "auth_method": "service_principal"
+    }
+  },
+  "cost_monitoring": {
+    "enabled": true,
+    "refresh_interval": 300,
+    "budget_alerts": true,
+    "cost_breakdown": [
+      "compute",
+      "storage",
+      "network",
+      "analytics"
+    ],
+    "currency": "USD"
+  },
+  "performance_monitoring": {
+    "enabled": true,
+    "metrics": [
+      "processing_time",
+      "data_volume",
+      "error_rate"
+    ],
+    "thresholds": {
+      "processing_time_minutes": 60,
+      "error_rate_percent": 5,
+      "cost_per_gb": 0.1
+    }
+  },
+  "integrations": {
+    "databricks": {
+      "workspace_url": null,
+      "token": null,
+      "catalog": "hive_metastore",
+      "schema": "default"
+    },
+    "gcp": {
+      "project_id": "mydatabrickssandbox",
+      "service_account_key": null,
+      "dataset": "analytics",
+      "location": "US"
+    },
+    "aws": {
+      "access_key_id": null,
+      "secret_access_key": null,
+      "region": "us-east-1",
+      "s3_bucket": null
+    },
+    "azure": {
+      "tenant_id": null,
+      "client_id": null,
+      "client_secret": null,
+      "subscription_id": null
+    }
+  }
+}

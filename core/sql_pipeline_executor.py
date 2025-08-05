@@ -20,7 +20,7 @@ from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.types import StructType
 import logging
 
-from utils.logger import log_function_call
+from shared.utils.logger import log_function_call
 
 
 @dataclass

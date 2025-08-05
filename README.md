@@ -65,6 +65,9 @@ python main.py sql retail
 
 # Run with specific environment
 python main.py sql ecommerce --environment prod
+
+# Run DLT pipeline with Auto Loader
+python workflows/sql_driven/run.py retail --pipeline-type dlt --source-path /path/to/data
 ```
 
 **PySpark ETL Workflow** - For Python-first development:
@@ -80,6 +83,19 @@ python main.py pyspark transformation --environment staging
 ```bash
 python main.py list
 ```
+
+### 🎯 **DLT and Auto Loader Support**
+
+Our SQL-driven workflow includes comprehensive **Delta Live Tables (DLT)** and **Auto Loader** support:
+
+- ✅ **Streaming Tables** with Auto Loader integration
+- ✅ **Materialized Views** for business analytics
+- ✅ **Data Quality Constraints** with FAIL UPDATE, DROP, RECORD
+- ✅ **CDC Processing** with APPLY CHANGES
+- ✅ **Complete Medallion Architecture** (Bronze → Silver → Gold)
+- ✅ **Pipeline Monitoring** and event logs
+
+**Perfect for Databricks Data Engineering Associate exam preparation!** 📚
 
 ## 🛠️ Commands Reference
 
