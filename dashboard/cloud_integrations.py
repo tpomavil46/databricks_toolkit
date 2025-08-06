@@ -154,6 +154,50 @@ class DatabricksIntegration:
                 })
             
             return pd.DataFrame(data)
+    
+    def get_catalogs(self) -> List[str]:
+        """Get all catalogs in the workspace"""
+        try:
+            from databricks.connect import DatabricksSession
+            spark = DatabricksSession.builder.remote().getOrCreate()
+            df = spark.sql("SHOW CATALOGS")
+            return [row['catalog'] for row in df.collect()]
+        except Exception as e:
+            print(f"Error getting catalogs: {e}")
+            return ['hive_metastore']  # Default fallback
+    
+    def get_schemas(self, catalog: str) -> List[str]:
+        """Get all schemas in a catalog"""
+        try:
+            from databricks.connect import DatabricksSession
+            spark = DatabricksSession.builder.remote().getOrCreate()
+            df = spark.sql(f"SHOW SCHEMAS IN {catalog}")
+            return [row['namespace'] for row in df.collect()]
+        except Exception as e:
+            print(f"Error getting schemas for {catalog}: {e}")
+            return ['default']  # Default fallback
+    
+    def get_tables(self, catalog: str, schema: str) -> List[str]:
+        """Get all tables in a schema"""
+        try:
+            from databricks.connect import DatabricksSession
+            spark = DatabricksSession.builder.remote().getOrCreate()
+            df = spark.sql(f"SHOW TABLES IN {catalog}.{schema}")
+            return [row['tableName'] for row in df.collect()]
+        except Exception as e:
+            print(f"Error getting tables for {catalog}.{schema}: {e}")
+            return []
+    
+    def query_table(self, table_name: str, limit: int = 1000) -> pd.DataFrame:
+        """Query a table and return as pandas DataFrame"""
+        try:
+            from databricks.connect import DatabricksSession
+            spark = DatabricksSession.builder.remote().getOrCreate()
+            df = spark.sql(f"SELECT * FROM {table_name} LIMIT {limit}")
+            return df.toPandas()
+        except Exception as e:
+            print(f"Error querying table {table_name}: {e}")
+            return pd.DataFrame()
 
 class GoogleCloudIntegration:
     """Google Cloud integration for data and cost monitoring."""

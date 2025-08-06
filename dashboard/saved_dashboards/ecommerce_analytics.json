@@ -1,0 +1,43 @@
+{
+  "name": "Ecommerce Analytics",
+  "title": "Ecommerce Analytics Dashboard",
+  "description": "Testing",
+  "pipeline_components": [
+    {
+      "table_name": "default.ecommerce_orders_bronze",
+      "full_name": "timpomaville.default.ecommerce_orders_bronze",
+      "layer_type": "Bronze",
+      "description": "Raw Data",
+      "depends_on": null,
+      "catalog": "timpomaville",
+      "schema": "default",
+      "table": "ecommerce_orders_bronze"
+    },
+    {
+      "table_name": "default.ecommerce_orders_silver",
+      "full_name": "timpomaville.default.ecommerce_orders_silver",
+      "layer_type": "Silver",
+      "description": "Transformed Data",
+      "depends_on": "default.ecommerce_orders_bronze",
+      "catalog": "timpomaville",
+      "schema": "default",
+      "table": "ecommerce_orders_silver"
+    },
+    {
+      "table_name": "default.ecommerce_orders_gold",
+      "full_name": "timpomaville.default.ecommerce_orders_gold",
+      "layer_type": "Gold",
+      "description": "Cleaned Data",
+      "depends_on": "default.ecommerce_orders_silver",
+      "catalog": "timpomaville",
+      "schema": "default",
+      "table": "ecommerce_orders_gold"
+    }
+  ],
+  "created_at": "2025-08-06 11:16:49.810853",
+  "tables": [
+    "timpomaville.default.ecommerce_orders_bronze",
+    "timpomaville.default.ecommerce_orders_silver",
+    "timpomaville.default.ecommerce_orders_gold"
+  ]
+}
