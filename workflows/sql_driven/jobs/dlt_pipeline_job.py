@@ -14,16 +14,17 @@ from datetime import datetime
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
+
 def create_dlt_pipeline_job():
     """Create a Databricks Job configuration for DLT pipeline."""
-    
+
     job_config = {
         "name": "DLT-Pipeline-Retail-Analytics",
         "description": "Delta Live Tables pipeline for retail analytics with streaming capabilities",
         "email_notifications": {
             "on_start": ["admin@company.com"],
             "on_success": ["admin@company.com"],
-            "on_failure": ["admin@company.com", "data-team@company.com"]
+            "on_failure": ["admin@company.com", "data-team@company.com"],
         },
         "max_concurrent_runs": 1,
         "tasks": [
@@ -32,13 +33,10 @@ def create_dlt_pipeline_job():
                 "description": "Setup environment and create test data",
                 "notebook_task": {
                     "notebook_path": "/Repos/databricks_toolkit/workflows/sql_driven/jobs/setup_environment",
-                    "base_parameters": {
-                        "environment": "prod",
-                        "project": "retail"
-                    }
+                    "base_parameters": {"environment": "prod", "project": "retail"},
                 },
                 "job_cluster_key": "dlt-cluster",
-                "timeout_seconds": 600
+                "timeout_seconds": 600,
             },
             {
                 "task_key": "bronze_ingestion",
@@ -48,16 +46,12 @@ def create_dlt_pipeline_job():
                     "base_parameters": {
                         "source_path": "/tmp/streaming_source",
                         "table_name": "retail_bronze",
-                        "file_format": "json"
-                    }
+                        "file_format": "json",
+                    },
                 },
                 "job_cluster_key": "dlt-cluster",
-                "depends_on": [
-                    {
-                        "task_key": "setup_environment"
-                    }
-                ],
-                "timeout_seconds": 1200
+                "depends_on": [{"task_key": "setup_environment"}],
+                "timeout_seconds": 1200,
             },
             {
                 "task_key": "silver_transformation",
@@ -66,16 +60,12 @@ def create_dlt_pipeline_job():
                     "notebook_path": "/Repos/databricks_toolkit/workflows/sql_driven/jobs/silver_transformation",
                     "base_parameters": {
                         "bronze_table": "retail_bronze",
-                        "silver_table": "retail_silver"
-                    }
+                        "silver_table": "retail_silver",
+                    },
                 },
                 "job_cluster_key": "dlt-cluster",
-                "depends_on": [
-                    {
-                        "task_key": "bronze_ingestion"
-                    }
-                ],
-                "timeout_seconds": 1200
+                "depends_on": [{"task_key": "bronze_ingestion"}],
+                "timeout_seconds": 1200,
             },
             {
                 "task_key": "gold_aggregation",
@@ -84,16 +74,12 @@ def create_dlt_pipeline_job():
                     "notebook_path": "/Repos/databricks_toolkit/workflows/sql_driven/jobs/gold_aggregation",
                     "base_parameters": {
                         "silver_table": "retail_silver",
-                        "gold_table": "retail_analytics"
-                    }
+                        "gold_table": "retail_analytics",
+                    },
                 },
                 "job_cluster_key": "dlt-cluster",
-                "depends_on": [
-                    {
-                        "task_key": "silver_transformation"
-                    }
-                ],
-                "timeout_seconds": 1200
+                "depends_on": [{"task_key": "silver_transformation"}],
+                "timeout_seconds": 1200,
             },
             {
                 "task_key": "create_dashboard",
@@ -102,17 +88,13 @@ def create_dlt_pipeline_job():
                     "notebook_path": "/Repos/databricks_toolkit/workflows/sql_driven/jobs/create_dashboard",
                     "base_parameters": {
                         "gold_table": "retail_analytics",
-                        "dashboard_name": "Retail Analytics Dashboard"
-                    }
+                        "dashboard_name": "Retail Analytics Dashboard",
+                    },
                 },
                 "job_cluster_key": "dlt-cluster",
-                "depends_on": [
-                    {
-                        "task_key": "gold_aggregation"
-                    }
-                ],
-                "timeout_seconds": 600
-            }
+                "depends_on": [{"task_key": "gold_aggregation"}],
+                "timeout_seconds": 600,
+            },
         ],
         "job_clusters": [
             {
@@ -123,21 +105,20 @@ def create_dlt_pipeline_job():
                     "num_workers": 2,
                     "spark_conf": {
                         "spark.databricks.delta.preview.enabled": "true",
-                        "spark.databricks.delta.liveTable.enabled": "true"
+                        "spark.databricks.delta.liveTable.enabled": "true",
                     },
-                    "aws_attributes": {
-                        "availability": "SPOT"
-                    }
-                }
+                    "aws_attributes": {"availability": "SPOT"},
+                },
             }
-        ]
+        ],
     }
-    
+
     return job_config
+
 
 def create_job_notebooks():
     """Create the notebook files for the job tasks."""
-    
+
     notebooks = {
         "setup_environment": """
 # Databricks notebook source
@@ -195,7 +176,6 @@ print("✅ Created test data in dbfs:/tmp/streaming_source/initial_batch")
 # MAGIC 
 # MAGIC The environment is now ready for the DLT pipeline to process the data.
 """,
-        
         "bronze_ingestion": """
 # Databricks notebook source
 # MAGIC %md
@@ -261,7 +241,6 @@ print("✅ Bronze layer ingestion completed")
 # MAGIC 
 # MAGIC The bronze layer is now ready to process new data as it arrives.
 """,
-        
         "silver_transformation": """
 # Databricks notebook source
 # MAGIC %md
@@ -344,7 +323,6 @@ print("✅ Silver layer transformation completed")
 # MAGIC 
 # MAGIC The silver layer is now ready with data quality checks.
 """,
-        
         "gold_aggregation": """
 # Databricks notebook source
 # MAGIC %md
@@ -428,7 +406,6 @@ print("✅ Gold layer aggregation completed")
 # MAGIC 
 # MAGIC The gold layer is now ready with real-time analytics.
 """,
-        
         "create_dashboard": """
 # Databricks notebook source
 # MAGIC %md
@@ -512,61 +489,63 @@ display(category_distribution)
 # MAGIC - Product Distribution
 # MAGIC - Quality Metrics
 # MAGIC - Real-time Analytics
-"""
+""",
     }
-    
+
     return notebooks
+
 
 def save_job_config():
     """Save the job configuration to a file."""
     job_config = create_dlt_pipeline_job()
-    
+
     # Create jobs directory if it doesn't exist
     jobs_dir = Path(__file__).parent
     jobs_dir.mkdir(exist_ok=True)
-    
+
     # Save job config
     config_file = jobs_dir / "dlt_pipeline_job.json"
-    with open(config_file, 'w') as f:
+    with open(config_file, "w") as f:
         json.dump(job_config, f, indent=2)
-    
+
     print(f"✅ Job configuration saved to: {config_file}")
-    
+
     # Save notebook files
     notebooks = create_job_notebooks()
     notebooks_dir = jobs_dir / "notebooks"
     notebooks_dir.mkdir(exist_ok=True)
-    
+
     for name, content in notebooks.items():
         notebook_file = notebooks_dir / f"{name}.py"
-        with open(notebook_file, 'w') as f:
+        with open(notebook_file, "w") as f:
             f.write(content)
         print(f"✅ Notebook saved: {notebook_file}")
-    
+
     return config_file
+
 
 if __name__ == "__main__":
     print("=" * 60)
     print("🔧 CREATING DATABRICKS JOB")
     print("=" * 60)
-    
+
     config_file = save_job_config()
-    
+
     print("\n📋 Job Configuration Summary:")
     print("  - Job Name: DLT-Pipeline-Retail-Analytics")
     print("  - Tasks: 5 (Setup → Bronze → Silver → Gold → Dashboard)")
     print("  - Cluster: Standard_DS3_v2 with 2 workers")
     print("  - Features: Auto Loader, Streaming Tables, Materialized Views")
-    
+
     print("\n🚀 To deploy this job:")
     print("  1. Upload the notebooks to your Databricks workspace")
     print("  2. Use the Databricks CLI or REST API to create the job")
     print("  3. Monitor the job runs in the Databricks Jobs UI")
-    
+
     print("\n📊 The job will create:")
     print("  - Bronze table with Auto Loader")
     print("  - Silver table with data quality")
     print("  - Gold table with real-time analytics")
     print("  - Interactive dashboard with visualizations")
-    
-    print("=" * 60) 
+
+    print("=" * 60)

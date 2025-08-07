@@ -1,8 +1,7 @@
-
 # Databricks notebook source
 # MAGIC %md
 # MAGIC # Silver Layer Transformation
-# MAGIC 
+# MAGIC
 # MAGIC This notebook handles the silver layer data transformation with quality checks.
 
 # COMMAND ----------
@@ -27,12 +26,12 @@ print(f"Silver table: {silver_table}")
 
 # MAGIC %md
 # MAGIC ## Silver Layer SQL
-# MAGIC 
+# MAGIC
 # MAGIC This creates a streaming table with data quality constraints.
 
 # COMMAND ----------
 
-silver_sql = f'''
+silver_sql = f"""
 CREATE OR REFRESH STREAMING TABLE {silver_table}
   (CONSTRAINT valid_id EXPECT (id IS NOT NULL) ON VIOLATION FAIL UPDATE)
   (CONSTRAINT valid_timestamp EXPECT (timestamp > "2021-01-01") ON VIOLATION DROP)
@@ -67,7 +66,7 @@ FROM STREAM(LIVE.{bronze_table})
 WHERE timestamp > "2021-01-01"
   AND price >= 0
   AND id IS NOT NULL
-'''
+"""
 
 print("Executing Silver Layer SQL...")
 spark.sql(silver_sql)
@@ -77,5 +76,5 @@ print("✅ Silver layer transformation completed")
 
 # MAGIC %md
 # MAGIC ## Silver Layer Complete
-# MAGIC 
+# MAGIC
 # MAGIC The silver layer is now ready with data quality checks.

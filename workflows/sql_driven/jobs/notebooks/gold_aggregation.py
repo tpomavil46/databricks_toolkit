@@ -1,8 +1,7 @@
-
 # Databricks notebook source
 # MAGIC %md
 # MAGIC # Gold Layer Aggregation
-# MAGIC 
+# MAGIC
 # MAGIC This notebook handles the gold layer analytics and aggregations.
 
 # COMMAND ----------
@@ -27,12 +26,12 @@ print(f"Gold table: {gold_table}")
 
 # MAGIC %md
 # MAGIC ## Gold Layer SQL
-# MAGIC 
+# MAGIC
 # MAGIC This creates a materialized view for real-time analytics.
 
 # COMMAND ----------
 
-gold_sql = f'''
+gold_sql = f"""
 CREATE OR REFRESH MATERIALIZED VIEW {gold_table}
 COMMENT "Gold layer materialized view for real-time business insights"
 TBLPROPERTIES ("quality" = "gold", "layer" = "gold")
@@ -68,7 +67,7 @@ GROUP BY
   name,
   category,
   product_category
-'''
+"""
 
 print("Executing Gold Layer SQL...")
 spark.sql(gold_sql)
@@ -78,5 +77,5 @@ print("✅ Gold layer aggregation completed")
 
 # MAGIC %md
 # MAGIC ## Gold Layer Complete
-# MAGIC 
+# MAGIC
 # MAGIC The gold layer is now ready with real-time analytics.

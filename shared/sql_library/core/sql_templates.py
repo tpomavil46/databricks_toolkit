@@ -14,6 +14,7 @@ import json
 @dataclass
 class SQLTemplate:
     """Represents a SQL template with metadata."""
+
     name: str
     description: str
     sql_template: str
@@ -26,42 +27,42 @@ class SQLTemplate:
 class SQLTemplates:
     """
     Parameterized SQL templates for common operations.
-    
+
     This class provides reusable SQL templates that leverage
     Databricks' built-in functionality and follow best practices.
     """
-    
+
     def __init__(self):
         """Initialize SQL templates."""
         self.templates = self._load_templates()
-    
+
     def _load_templates(self) -> Dict[str, SQLTemplate]:
         """Load all SQL templates."""
         templates = {}
-        
+
         # Data Pipeline Templates
         templates.update(self._get_pipeline_templates())
-        
+
         # Analytics Templates
         templates.update(self._get_analytics_templates())
-        
+
         # Data Quality Templates
         templates.update(self._get_quality_templates())
-        
+
         # Reporting Templates
         templates.update(self._get_reporting_templates())
-        
+
         # Maintenance Templates
         templates.update(self._get_maintenance_templates())
-        
+
         return templates
-    
+
     def _get_pipeline_templates(self) -> Dict[str, SQLTemplate]:
         """Get data pipeline templates."""
         return {
-            'bronze_to_silver_pipeline': SQLTemplate(
-                name='Bronze to Silver Pipeline',
-                description='Complete pipeline from bronze to silver layer',
+            "bronze_to_silver_pipeline": SQLTemplate(
+                name="Bronze to Silver Pipeline",
+                description="Complete pipeline from bronze to silver layer",
                 sql_template="""
 -- Bronze to Silver Pipeline
 -- Parameters: {catalog}, {schema}, {table_name}, {quality_conditions}, {transformations}
@@ -95,18 +96,24 @@ SELECT
     current_timestamp() as execution_timestamp
 FROM {catalog}.{schema}.{table_name}_silver;
 """,
-                parameters=['catalog', 'schema', 'table_name', 'quality_conditions', 'transformations'],
-                category='pipeline',
-                tags=['bronze', 'silver', 'pipeline', 'transformation'],
+                parameters=[
+                    "catalog",
+                    "schema",
+                    "table_name",
+                    "quality_conditions",
+                    "transformations",
+                ],
+                category="pipeline",
+                tags=["bronze", "silver", "pipeline", "transformation"],
                 examples=[
                     {
-                        'description': 'Transform customer data from bronze to silver',
-                        'parameters': {
-                            'catalog': 'hive_metastore',
-                            'schema': 'retail',
-                            'table_name': 'customers',
-                            'quality_conditions': 'customer_id IS NOT NULL AND customer_name IS NOT NULL',
-                            'transformations': '''
+                        "description": "Transform customer data from bronze to silver",
+                        "parameters": {
+                            "catalog": "hive_metastore",
+                            "schema": "retail",
+                            "table_name": "customers",
+                            "quality_conditions": "customer_id IS NOT NULL AND customer_name IS NOT NULL",
+                            "transformations": """
                                 customer_id,
                                 TRIM(customer_name) as customer_name,
                                 LOWER(TRIM(email)) as email,
@@ -114,15 +121,14 @@ FROM {catalog}.{schema}.{table_name}_silver;
                                 INITCAP(TRIM(city)) as city,
                                 UPPER(TRIM(state)) as state,
                                 UPPER(TRIM(country)) as country
-                            '''
-                        }
+                            """,
+                        },
                     }
-                ]
+                ],
             ),
-            
-            'incremental_merge_pipeline': SQLTemplate(
-                name='Incremental Merge Pipeline',
-                description='Incremental merge pipeline with deduplication',
+            "incremental_merge_pipeline": SQLTemplate(
+                name="Incremental Merge Pipeline",
+                description="Incremental merge pipeline with deduplication",
                 sql_template="""
 -- Incremental Merge Pipeline
 -- Parameters: {catalog}, {schema}, {table_name}, {source_table}, {partition_key}, {timestamp_column}
@@ -167,31 +173,38 @@ SELECT
     current_timestamp() as execution_timestamp
 FROM {catalog}.{schema}.{table_name}_silver;
 """,
-                parameters=['catalog', 'schema', 'table_name', 'source_table', 'partition_key', 'timestamp_column'],
-                category='pipeline',
-                tags=['incremental', 'merge', 'pipeline', 'deduplication'],
+                parameters=[
+                    "catalog",
+                    "schema",
+                    "table_name",
+                    "source_table",
+                    "partition_key",
+                    "timestamp_column",
+                ],
+                category="pipeline",
+                tags=["incremental", "merge", "pipeline", "deduplication"],
                 examples=[
                     {
-                        'description': 'Incremental merge for customer data',
-                        'parameters': {
-                            'catalog': 'hive_metastore',
-                            'schema': 'retail',
-                            'table_name': 'customers',
-                            'source_table': 'csv.`/mnt/databricks-datasets/retail-org/customers/`',
-                            'partition_key': 'customer_id',
-                            'timestamp_column': 'updated_at'
-                        }
+                        "description": "Incremental merge for customer data",
+                        "parameters": {
+                            "catalog": "hive_metastore",
+                            "schema": "retail",
+                            "table_name": "customers",
+                            "source_table": "csv.`/mnt/databricks-datasets/retail-org/customers/`",
+                            "partition_key": "customer_id",
+                            "timestamp_column": "updated_at",
+                        },
                     }
-                ]
-            )
+                ],
+            ),
         }
-    
+
     def _get_analytics_templates(self) -> Dict[str, SQLTemplate]:
         """Get analytics templates."""
         return {
-            'customer_analytics': SQLTemplate(
-                name='Customer Analytics',
-                description='Comprehensive customer analytics dashboard',
+            "customer_analytics": SQLTemplate(
+                name="Customer Analytics",
+                description="Comprehensive customer analytics dashboard",
                 sql_template="""
 -- Customer Analytics Dashboard
 -- Parameters: {catalog}, {schema}, {start_date}, {end_date}
@@ -222,25 +235,24 @@ LEFT JOIN {catalog}.{schema}.orders_silver o ON c.customer_id = o.customer_id
 WHERE o.order_date BETWEEN '{start_date}' AND '{end_date}'
 GROUP BY c.customer_id, c.customer_name, c.country, c.state, c.city;
 """,
-                parameters=['catalog', 'schema', 'start_date', 'end_date'],
-                category='analytics',
-                tags=['customer', 'analytics', 'dashboard', 'segmentation'],
+                parameters=["catalog", "schema", "start_date", "end_date"],
+                category="analytics",
+                tags=["customer", "analytics", "dashboard", "segmentation"],
                 examples=[
                     {
-                        'description': 'Generate customer analytics for 2024',
-                        'parameters': {
-                            'catalog': 'hive_metastore',
-                            'schema': 'retail',
-                            'start_date': '2024-01-01',
-                            'end_date': '2024-12-31'
-                        }
+                        "description": "Generate customer analytics for 2024",
+                        "parameters": {
+                            "catalog": "hive_metastore",
+                            "schema": "retail",
+                            "start_date": "2024-01-01",
+                            "end_date": "2024-12-31",
+                        },
                     }
-                ]
+                ],
             ),
-            
-            'sales_analytics': SQLTemplate(
-                name='Sales Analytics',
-                description='Comprehensive sales analytics and KPIs',
+            "sales_analytics": SQLTemplate(
+                name="Sales Analytics",
+                description="Comprehensive sales analytics and KPIs",
                 sql_template="""
 -- Sales Analytics Dashboard
 -- Parameters: {catalog}, {schema}, {start_date}, {end_date}, {group_by_columns}
@@ -262,30 +274,36 @@ WHERE o.order_date BETWEEN '{start_date}' AND '{end_date}'
 GROUP BY {group_by_columns}, DATE_TRUNC('month', o.order_date)
 ORDER BY month, {group_by_columns};
 """,
-                parameters=['catalog', 'schema', 'start_date', 'end_date', 'group_by_columns'],
-                category='analytics',
-                tags=['sales', 'analytics', 'kpis', 'revenue'],
+                parameters=[
+                    "catalog",
+                    "schema",
+                    "start_date",
+                    "end_date",
+                    "group_by_columns",
+                ],
+                category="analytics",
+                tags=["sales", "analytics", "kpis", "revenue"],
                 examples=[
                     {
-                        'description': 'Generate sales analytics by product category',
-                        'parameters': {
-                            'catalog': 'hive_metastore',
-                            'schema': 'retail',
-                            'start_date': '2024-01-01',
-                            'end_date': '2024-12-31',
-                            'group_by_columns': 'p.product_category, p.product_name'
-                        }
+                        "description": "Generate sales analytics by product category",
+                        "parameters": {
+                            "catalog": "hive_metastore",
+                            "schema": "retail",
+                            "start_date": "2024-01-01",
+                            "end_date": "2024-12-31",
+                            "group_by_columns": "p.product_category, p.product_name",
+                        },
                     }
-                ]
-            )
+                ],
+            ),
         }
-    
+
     def _get_quality_templates(self) -> Dict[str, SQLTemplate]:
         """Get data quality templates."""
         return {
-            'comprehensive_quality_check': SQLTemplate(
-                name='Comprehensive Quality Check',
-                description='Complete data quality assessment for a table',
+            "comprehensive_quality_check": SQLTemplate(
+                name="Comprehensive Quality Check",
+                description="Complete data quality assessment for a table",
                 sql_template="""
 -- Comprehensive Data Quality Check
 -- Parameters: {catalog}, {schema}, {table_name}, {key_columns}, {numeric_columns}, {text_columns}
@@ -353,31 +371,38 @@ SELECT
     END as quality_score
 FROM {catalog}.{schema}.{table_name};
 """,
-                parameters=['catalog', 'schema', 'table_name', 'key_columns', 'numeric_columns', 'text_columns'],
-                category='quality',
-                tags=['quality_check', 'completeness', 'uniqueness', 'assessment'],
+                parameters=[
+                    "catalog",
+                    "schema",
+                    "table_name",
+                    "key_columns",
+                    "numeric_columns",
+                    "text_columns",
+                ],
+                category="quality",
+                tags=["quality_check", "completeness", "uniqueness", "assessment"],
                 examples=[
                     {
-                        'description': 'Comprehensive quality check for customers table',
-                        'parameters': {
-                            'catalog': 'hive_metastore',
-                            'schema': 'retail',
-                            'table_name': 'customers_silver',
-                            'key_columns': 'customer_id',
-                            'numeric_columns': 'customer_id',
-                            'text_columns': 'customer_name, email'
-                        }
+                        "description": "Comprehensive quality check for customers table",
+                        "parameters": {
+                            "catalog": "hive_metastore",
+                            "schema": "retail",
+                            "table_name": "customers_silver",
+                            "key_columns": "customer_id",
+                            "numeric_columns": "customer_id",
+                            "text_columns": "customer_name, email",
+                        },
                     }
-                ]
+                ],
             )
         }
-    
+
     def _get_reporting_templates(self) -> Dict[str, SQLTemplate]:
         """Get reporting templates."""
         return {
-            'executive_summary': SQLTemplate(
-                name='Executive Summary Report',
-                description='High-level executive summary with key metrics',
+            "executive_summary": SQLTemplate(
+                name="Executive Summary Report",
+                description="High-level executive summary with key metrics",
                 sql_template="""
 -- Executive Summary Report
 -- Parameters: {catalog}, {schema}, {report_date}
@@ -399,28 +424,28 @@ AS SELECT
 FROM {catalog}.{schema}.orders_silver
 WHERE order_date <= '{report_date}';
 """,
-                parameters=['catalog', 'schema', 'report_date'],
-                category='reporting',
-                tags=['executive', 'summary', 'kpis', 'report'],
+                parameters=["catalog", "schema", "report_date"],
+                category="reporting",
+                tags=["executive", "summary", "kpis", "report"],
                 examples=[
                     {
-                        'description': 'Generate executive summary for 2024-12-31',
-                        'parameters': {
-                            'catalog': 'hive_metastore',
-                            'schema': 'retail',
-                            'report_date': '2024-12-31'
-                        }
+                        "description": "Generate executive summary for 2024-12-31",
+                        "parameters": {
+                            "catalog": "hive_metastore",
+                            "schema": "retail",
+                            "report_date": "2024-12-31",
+                        },
                     }
-                ]
+                ],
             )
         }
-    
+
     def _get_maintenance_templates(self) -> Dict[str, SQLTemplate]:
         """Get maintenance templates."""
         return {
-            'table_optimization': SQLTemplate(
-                name='Table Optimization',
-                description='Optimize table performance and storage',
+            "table_optimization": SQLTemplate(
+                name="Table Optimization",
+                description="Optimize table performance and storage",
                 sql_template="""
 -- Table Optimization
 -- Parameters: {catalog}, {schema}, {table_name}
@@ -448,25 +473,24 @@ VALUES (
     'completed'
 );
 """,
-                parameters=['catalog', 'schema', 'table_name', 'zorder_columns'],
-                category='maintenance',
-                tags=['optimization', 'performance', 'maintenance'],
+                parameters=["catalog", "schema", "table_name", "zorder_columns"],
+                category="maintenance",
+                tags=["optimization", "performance", "maintenance"],
                 examples=[
                     {
-                        'description': 'Optimize customers table',
-                        'parameters': {
-                            'catalog': 'hive_metastore',
-                            'schema': 'retail',
-                            'table_name': 'customers_silver',
-                            'zorder_columns': 'customer_id, country, state'
-                        }
+                        "description": "Optimize customers table",
+                        "parameters": {
+                            "catalog": "hive_metastore",
+                            "schema": "retail",
+                            "table_name": "customers_silver",
+                            "zorder_columns": "customer_id, country, state",
+                        },
                     }
-                ]
+                ],
             ),
-            
-            'data_retention': SQLTemplate(
-                name='Data Retention Policy',
-                description='Implement data retention policy',
+            "data_retention": SQLTemplate(
+                name="Data Retention Policy",
+                description="Implement data retention policy",
                 sql_template="""
 -- Data Retention Policy
 -- Parameters: {catalog}, {schema}, {table_name}, {retention_days}, {date_column}
@@ -497,80 +521,88 @@ VALUES (
     'Retained {retention_days} days of data'
 );
 """,
-                parameters=['catalog', 'schema', 'table_name', 'retention_days', 'date_column'],
-                category='maintenance',
-                tags=['retention', 'archive', 'cleanup', 'maintenance'],
+                parameters=[
+                    "catalog",
+                    "schema",
+                    "table_name",
+                    "retention_days",
+                    "date_column",
+                ],
+                category="maintenance",
+                tags=["retention", "archive", "cleanup", "maintenance"],
                 examples=[
                     {
-                        'description': 'Implement 2-year retention for orders',
-                        'parameters': {
-                            'catalog': 'hive_metastore',
-                            'schema': 'retail',
-                            'table_name': 'orders_silver',
-                            'retention_days': 730,
-                            'date_column': 'order_date'
-                        }
+                        "description": "Implement 2-year retention for orders",
+                        "parameters": {
+                            "catalog": "hive_metastore",
+                            "schema": "retail",
+                            "table_name": "orders_silver",
+                            "retention_days": 730,
+                            "date_column": "order_date",
+                        },
                     }
-                ]
-            )
+                ],
+            ),
         }
-    
+
     def get_template(self, template_name: str) -> Optional[SQLTemplate]:
         """Get a specific SQL template by name."""
         return self.templates.get(template_name)
-    
+
     def list_templates(self, category: Optional[str] = None) -> List[SQLTemplate]:
         """List all templates, optionally filtered by category."""
         if category:
             return [t for t in self.templates.values() if t.category == category]
         return list(self.templates.values())
-    
+
     def render_template(self, template_name: str, parameters: Dict[str, Any]) -> str:
         """Render a SQL template with the given parameters."""
         template = self.get_template(template_name)
         if not template:
             raise ValueError(f"Template '{template_name}' not found")
-        
+
         # Validate required parameters
         missing_params = [p for p in template.parameters if p not in parameters]
         if missing_params:
             raise ValueError(f"Missing required parameters: {missing_params}")
-        
+
         # Render the SQL template
         return template.sql_template.format(**parameters)
-    
+
     def get_template_examples(self, template_name: str) -> List[Dict[str, Any]]:
         """Get examples for a specific template."""
         template = self.get_template(template_name)
         return template.examples if template else []
-    
+
     def search_templates(self, query: str) -> List[SQLTemplate]:
         """Search templates by name, description, or tags."""
         query_lower = query.lower()
         results = []
-        
+
         for template in self.templates.values():
-            if (query_lower in template.name.lower() or
-                query_lower in template.description.lower() or
-                any(query_lower in tag.lower() for tag in template.tags)):
+            if (
+                query_lower in template.name.lower()
+                or query_lower in template.description.lower()
+                or any(query_lower in tag.lower() for tag in template.tags)
+            ):
                 results.append(template)
-        
+
         return results
-    
+
     def create_template_library(self, output_file: Optional[str] = None) -> str:
         """Create a complete SQL template library file."""
         library_sql = "-- SQL Template Library\n"
         library_sql += "-- Generated by Databricks Toolkit\n\n"
-        
+
         for template in self.templates.values():
             library_sql += f"-- {template.name}: {template.description}\n"
             library_sql += f"-- Parameters: {', '.join(template.parameters)}\n"
             library_sql += f"-- Category: {template.category}\n"
             library_sql += f"-- Tags: {', '.join(template.tags)}\n\n"
             library_sql += template.sql_template + "\n\n"
-        
+
         if output_file:
-            with open(output_file, 'w') as f:
+            with open(output_file, "w") as f:
                 f.write(library_sql)
-        
-        return library_sql 
+
+        return library_sql

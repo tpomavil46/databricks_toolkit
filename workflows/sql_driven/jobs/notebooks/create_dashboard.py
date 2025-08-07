@@ -1,8 +1,7 @@
-
 # Databricks notebook source
 # MAGIC %md
 # MAGIC # Create Analytics Dashboard
-# MAGIC 
+# MAGIC
 # MAGIC This notebook creates and updates the analytics dashboard.
 
 # COMMAND ----------
@@ -42,7 +41,8 @@ display(analytics_df)
 # COMMAND ----------
 
 # Revenue by category
-revenue_by_category = spark.sql(f'''
+revenue_by_category = spark.sql(
+    f"""
 SELECT 
   category,
   SUM(total_revenue) as total_revenue,
@@ -50,14 +50,16 @@ SELECT
 FROM {gold_table}
 GROUP BY category
 ORDER BY total_revenue DESC
-''')
+"""
+)
 
 display(revenue_by_category)
 
 # COMMAND ----------
 
 # Product category distribution
-category_distribution = spark.sql(f'''
+category_distribution = spark.sql(
+    f"""
 SELECT 
   product_category,
   COUNT(*) as product_count,
@@ -65,7 +67,8 @@ SELECT
 FROM {gold_table}
 GROUP BY product_category
 ORDER BY product_count DESC
-''')
+"""
+)
 
 display(category_distribution)
 
@@ -73,9 +76,9 @@ display(category_distribution)
 
 # MAGIC %md
 # MAGIC ## Dashboard Complete
-# MAGIC 
+# MAGIC
 # MAGIC The analytics dashboard has been created with visualizations.
-# MAGIC 
+# MAGIC
 # MAGIC **Key Metrics:**
 # MAGIC - Total Revenue by Category
 # MAGIC - Product Distribution

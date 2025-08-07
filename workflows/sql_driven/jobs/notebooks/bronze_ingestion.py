@@ -1,8 +1,7 @@
-
 # Databricks notebook source
 # MAGIC %md
 # MAGIC # Bronze Layer Ingestion
-# MAGIC 
+# MAGIC
 # MAGIC This notebook handles the bronze layer data ingestion using Auto Loader.
 
 # COMMAND ----------
@@ -31,12 +30,12 @@ print(f"File format: {file_format}")
 
 # MAGIC %md
 # MAGIC ## Bronze Layer SQL
-# MAGIC 
+# MAGIC
 # MAGIC This creates a streaming table that processes new data as it arrives.
 
 # COMMAND ----------
 
-bronze_sql = f'''
+bronze_sql = f"""
 CREATE OR REFRESH STREAMING TABLE {table_name}
   (CONSTRAINT valid_timestamp EXPECT (processing_time IS NOT NULL) ON VIOLATION FAIL UPDATE)
   (CONSTRAINT valid_source EXPECT (source_file IS NOT NULL) ON VIOLATION DROP)
@@ -50,7 +49,7 @@ SELECT
   _metadata.file_size AS file_size,
   _metadata.file_modification_time AS file_timestamp
 FROM cloud_files("dbfs:{source_path}", "{file_format}", map("cloudFiles.inferColumnTypes", "true", "cloudFiles.schemaLocation", "dbfs:/tmp/schema_location"))
-'''
+"""
 
 print("Executing Bronze Layer SQL...")
 spark.sql(bronze_sql)
@@ -60,5 +59,5 @@ print("✅ Bronze layer ingestion completed")
 
 # MAGIC %md
 # MAGIC ## Bronze Layer Complete
-# MAGIC 
+# MAGIC
 # MAGIC The bronze layer is now ready to process new data as it arrives.

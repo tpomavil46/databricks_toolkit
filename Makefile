@@ -136,39 +136,35 @@ run-generate-kpis-remote:
 
 billing-costs:
 	@echo "💰 Getting monthly costs for $(YEAR)-$(MONTH)..."
-	. $(VENV_ACTIVATE) && python -c "
-from utils.billing_monitor import BillingMonitor, BillingCLI
-monitor = BillingMonitor()
-cli = BillingCLI(monitor)
-cli.run_monthly_report($(YEAR), $(MONTH))
-"
+	. $(VENV_ACTIVATE) && python -c "\
+from utils.billing_monitor import BillingMonitor, BillingCLI; \
+monitor = BillingMonitor(); \
+cli = BillingCLI(monitor); \
+cli.run_monthly_report($(YEAR), $(MONTH))"
 
 billing-report:
 	@echo "📊 Generating comprehensive cost report for $(YEAR)-$(MONTH)..."
-	. $(VENV_ACTIVATE) && python -c "
-from utils.billing_monitor import BillingMonitor
-import json
-monitor = BillingMonitor()
-report = monitor.generate_cost_report($(YEAR), $(MONTH))
-print(json.dumps(report, indent=2, default=str))
-"
+	. $(VENV_ACTIVATE) && python -c "\
+from utils.billing_monitor import BillingMonitor; \
+import json; \
+monitor = BillingMonitor(); \
+report = monitor.generate_cost_report($(YEAR), $(MONTH)); \
+print(json.dumps(report, indent=2, default=str))"
 
 billing-check:
 	@echo "🔍 Checking cost threshold ($$(THRESHOLD))..."
-	. $(VENV_ACTIVATE) && python -c "
-from utils.billing_monitor import BillingMonitor, BillingCLI
-monitor = BillingMonitor()
-cli = BillingCLI(monitor)
-cli.run_cost_check($(THRESHOLD))
-"
+	. $(VENV_ACTIVATE) && python -c "\
+from utils.billing_monitor import BillingMonitor, BillingCLI; \
+monitor = BillingMonitor(); \
+cli = BillingCLI(monitor); \
+cli.run_cost_check($(THRESHOLD))"
 
 billing-dashboard:
 	@echo "📈 Getting dashboard data..."
-	. $(VENV_ACTIVATE) && python -c "
-from utils.billing_monitor import BillingMonitor, BillingDashboard
-import json
-monitor = BillingMonitor()
-dashboard = BillingDashboard(monitor)
-data = dashboard.get_dashboard_data()
-print(json.dumps(data, indent=2, default=str))
-"
+	. $(VENV_ACTIVATE) && python -c "\
+from utils.billing_monitor import BillingMonitor, BillingDashboard; \
+import json; \
+monitor = BillingMonitor(); \
+dashboard = BillingDashboard(monitor); \
+data = dashboard.get_dashboard_data(); \
+print(json.dumps(data, indent=2, default=str))"

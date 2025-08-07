@@ -22,13 +22,13 @@ def test_file_operations():
         # Create test data
         test_file = Path(temp_dir) / "test_customers.csv"
         test_data = "customer_id,customer_name,email\n1,John Doe,john@example.com\n2,Jane Smith,jane@example.com\n"
-        
+
         with open(test_file, "w") as f:
             f.write(test_data)
-        
+
         # Verify file was created
         assert test_file.exists()
-        
+
         # Verify content
         with open(test_file, "r") as f:
             content = f.read()

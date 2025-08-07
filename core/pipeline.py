@@ -37,18 +37,23 @@ class MedallionPipeline:
         """Check billing costs before running expensive operations."""
         try:
             from utils.billing_monitor import BillingMonitor
+
             monitor = BillingMonitor()
             status = monitor.check_cost_threshold(cost_threshold)
-            
-            if status['alert']:
-                print(f"⚠️ WARNING: Current month costs (${status['total_cost']:.2f}) exceed threshold (${cost_threshold})")
+
+            if status["alert"]:
+                print(
+                    f"⚠️ WARNING: Current month costs (${status['total_cost']:.2f}) exceed threshold (${cost_threshold})"
+                )
                 print(f"   Databricks costs: ${status['databricks_cost']:.2f}")
                 response = input("Continue with pipeline? (y/N): ")
-                if response.lower() != 'y':
+                if response.lower() != "y":
                     raise Exception("Pipeline cancelled due to cost threshold")
             else:
-                print(f"✅ Cost check passed: ${status['total_cost']:.2f} (threshold: ${cost_threshold})")
-                
+                print(
+                    f"✅ Cost check passed: ${status['total_cost']:.2f} (threshold: ${cost_threshold})"
+                )
+
         except ImportError:
             print("⚠️ Billing monitor not available - skipping cost check")
         except Exception as e:

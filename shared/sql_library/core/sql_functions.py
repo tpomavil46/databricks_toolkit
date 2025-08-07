@@ -13,6 +13,7 @@ import json
 @dataclass
 class SQLFunction:
     """Represents a SQL function with metadata."""
+
     name: str
     description: str
     sql_definition: str
@@ -26,42 +27,42 @@ class SQLFunction:
 class SQLFunctions:
     """
     Reusable SQL functions for common operations.
-    
+
     This class provides SQL functions that leverage
     Databricks' built-in functionality and follow best practices.
     """
-    
+
     def __init__(self):
         """Initialize SQL functions."""
         self.functions = self._load_functions()
-    
+
     def _load_functions(self) -> Dict[str, SQLFunction]:
         """Load all SQL functions."""
         functions = {}
-        
+
         # String Functions
         functions.update(self._get_string_functions())
-        
+
         # Date/Time Functions
         functions.update(self._get_datetime_functions())
-        
+
         # Numeric Functions
         functions.update(self._get_numeric_functions())
-        
+
         # Data Quality Functions
         functions.update(self._get_quality_functions())
-        
+
         # Business Logic Functions
         functions.update(self._get_business_functions())
-        
+
         return functions
-    
+
     def _get_string_functions(self) -> Dict[str, SQLFunction]:
         """Get string manipulation functions."""
         return {
-            'clean_string': SQLFunction(
-                name='clean_string',
-                description='Clean and standardize string values',
+            "clean_string": SQLFunction(
+                name="clean_string",
+                description="Clean and standardize string values",
                 sql_definition="""
 CREATE OR REPLACE FUNCTION clean_string(
     input_string STRING,
@@ -100,22 +101,26 @@ CREATE OR REPLACE FUNCTION clean_string(
     END
 $$;
 """,
-                parameters=['input_string', 'remove_special_chars', 'trim_whitespace', 'to_lowercase'],
-                return_type='STRING',
-                category='string',
-                tags=['cleaning', 'standardization', 'string'],
+                parameters=[
+                    "input_string",
+                    "remove_special_chars",
+                    "trim_whitespace",
+                    "to_lowercase",
+                ],
+                return_type="STRING",
+                category="string",
+                tags=["cleaning", "standardization", "string"],
                 examples=[
                     {
-                        'description': 'Clean customer name',
-                        'usage': "SELECT clean_string('  John Doe!@#  ', TRUE, TRUE, FALSE) as cleaned_name",
-                        'expected': "'John Doe'"
+                        "description": "Clean customer name",
+                        "usage": "SELECT clean_string('  John Doe!@#  ', TRUE, TRUE, FALSE) as cleaned_name",
+                        "expected": "'John Doe'",
                     }
-                ]
+                ],
             ),
-            
-            'validate_email': SQLFunction(
-                name='validate_email',
-                description='Validate email format using regex',
+            "validate_email": SQLFunction(
+                name="validate_email",
+                description="Validate email format using regex",
                 sql_definition="""
 CREATE OR REPLACE FUNCTION validate_email(email STRING) RETURNS BOOLEAN AS $$
     SELECT CASE 
@@ -125,22 +130,21 @@ CREATE OR REPLACE FUNCTION validate_email(email STRING) RETURNS BOOLEAN AS $$
     END
 $$;
 """,
-                parameters=['email'],
-                return_type='BOOLEAN',
-                category='string',
-                tags=['validation', 'email', 'regex'],
+                parameters=["email"],
+                return_type="BOOLEAN",
+                category="string",
+                tags=["validation", "email", "regex"],
                 examples=[
                     {
-                        'description': 'Validate email format',
-                        'usage': "SELECT validate_email('john.doe@company.com') as is_valid",
-                        'expected': 'TRUE'
+                        "description": "Validate email format",
+                        "usage": "SELECT validate_email('john.doe@company.com') as is_valid",
+                        "expected": "TRUE",
                     }
-                ]
+                ],
             ),
-            
-            'extract_domain': SQLFunction(
-                name='extract_domain',
-                description='Extract domain from email address',
+            "extract_domain": SQLFunction(
+                name="extract_domain",
+                description="Extract domain from email address",
                 sql_definition="""
 CREATE OR REPLACE FUNCTION extract_domain(email STRING) RETURNS STRING AS $$
     SELECT CASE 
@@ -151,26 +155,26 @@ CREATE OR REPLACE FUNCTION extract_domain(email STRING) RETURNS STRING AS $$
     END
 $$;
 """,
-                parameters=['email'],
-                return_type='STRING',
-                category='string',
-                tags=['extraction', 'email', 'domain'],
+                parameters=["email"],
+                return_type="STRING",
+                category="string",
+                tags=["extraction", "email", "domain"],
                 examples=[
                     {
-                        'description': 'Extract domain from email',
-                        'usage': "SELECT extract_domain('john.doe@company.com') as domain",
-                        'expected': "'company.com'"
+                        "description": "Extract domain from email",
+                        "usage": "SELECT extract_domain('john.doe@company.com') as domain",
+                        "expected": "'company.com'",
                     }
-                ]
-            )
+                ],
+            ),
         }
-    
+
     def _get_datetime_functions(self) -> Dict[str, SQLFunction]:
         """Get date/time manipulation functions."""
         return {
-            'age_in_days': SQLFunction(
-                name='age_in_days',
-                description='Calculate age in days between two dates',
+            "age_in_days": SQLFunction(
+                name="age_in_days",
+                description="Calculate age in days between two dates",
                 sql_definition="""
 CREATE OR REPLACE FUNCTION age_in_days(
     start_date DATE,
@@ -179,22 +183,21 @@ CREATE OR REPLACE FUNCTION age_in_days(
     SELECT DATEDIFF(end_date, start_date)
 $$;
 """,
-                parameters=['start_date', 'end_date'],
-                return_type='INT',
-                category='datetime',
-                tags=['age', 'calculation', 'date'],
+                parameters=["start_date", "end_date"],
+                return_type="INT",
+                category="datetime",
+                tags=["age", "calculation", "date"],
                 examples=[
                     {
-                        'description': 'Calculate customer age in days',
-                        'usage': "SELECT age_in_days('1990-01-01') as age_days",
-                        'expected': 'Number of days since 1990-01-01'
+                        "description": "Calculate customer age in days",
+                        "usage": "SELECT age_in_days('1990-01-01') as age_days",
+                        "expected": "Number of days since 1990-01-01",
                     }
-                ]
+                ],
             ),
-            
-            'business_days_between': SQLFunction(
-                name='business_days_between',
-                description='Calculate business days between two dates',
+            "business_days_between": SQLFunction(
+                name="business_days_between",
+                description="Calculate business days between two dates",
                 sql_definition="""
 CREATE OR REPLACE FUNCTION business_days_between(
     start_date DATE,
@@ -206,47 +209,46 @@ CREATE OR REPLACE FUNCTION business_days_between(
            CASE WHEN DAYOFWEEK(end_date) = 7 THEN 1 ELSE 0 END
 $$;
 """,
-                parameters=['start_date', 'end_date'],
-                return_type='INT',
-                category='datetime',
-                tags=['business_days', 'calculation', 'date'],
+                parameters=["start_date", "end_date"],
+                return_type="INT",
+                category="datetime",
+                tags=["business_days", "calculation", "date"],
                 examples=[
                     {
-                        'description': 'Calculate business days between dates',
-                        'usage': "SELECT business_days_between('2024-01-01', '2024-01-31') as business_days",
-                        'expected': 'Number of business days'
+                        "description": "Calculate business days between dates",
+                        "usage": "SELECT business_days_between('2024-01-01', '2024-01-31') as business_days",
+                        "expected": "Number of business days",
                     }
-                ]
+                ],
             ),
-            
-            'is_weekend': SQLFunction(
-                name='is_weekend',
-                description='Check if a date falls on weekend',
+            "is_weekend": SQLFunction(
+                name="is_weekend",
+                description="Check if a date falls on weekend",
                 sql_definition="""
 CREATE OR REPLACE FUNCTION is_weekend(check_date DATE) RETURNS BOOLEAN AS $$
     SELECT DAYOFWEEK(check_date) IN (1, 7)
 $$;
 """,
-                parameters=['check_date'],
-                return_type='BOOLEAN',
-                category='datetime',
-                tags=['weekend', 'date', 'boolean'],
+                parameters=["check_date"],
+                return_type="BOOLEAN",
+                category="datetime",
+                tags=["weekend", "date", "boolean"],
                 examples=[
                     {
-                        'description': 'Check if date is weekend',
-                        'usage': "SELECT is_weekend('2024-01-06') as is_weekend",
-                        'expected': 'TRUE (if Saturday)'
+                        "description": "Check if date is weekend",
+                        "usage": "SELECT is_weekend('2024-01-06') as is_weekend",
+                        "expected": "TRUE (if Saturday)",
                     }
-                ]
-            )
+                ],
+            ),
         }
-    
+
     def _get_numeric_functions(self) -> Dict[str, SQLFunction]:
         """Get numeric calculation functions."""
         return {
-            'calculate_percentage': SQLFunction(
-                name='calculate_percentage',
-                description='Calculate percentage with null handling',
+            "calculate_percentage": SQLFunction(
+                name="calculate_percentage",
+                description="Calculate percentage with null handling",
                 sql_definition="""
 CREATE OR REPLACE FUNCTION calculate_percentage(
     numerator DECIMAL(10,2),
@@ -259,22 +261,21 @@ CREATE OR REPLACE FUNCTION calculate_percentage(
     END
 $$;
 """,
-                parameters=['numerator', 'denominator', 'decimal_places'],
-                return_type='DECIMAL(10,2)',
-                category='numeric',
-                tags=['percentage', 'calculation', 'null_safe'],
+                parameters=["numerator", "denominator", "decimal_places"],
+                return_type="DECIMAL(10,2)",
+                category="numeric",
+                tags=["percentage", "calculation", "null_safe"],
                 examples=[
                     {
-                        'description': 'Calculate completion percentage',
-                        'usage': "SELECT calculate_percentage(75, 100, 2) as completion_pct",
-                        'expected': '75.00'
+                        "description": "Calculate completion percentage",
+                        "usage": "SELECT calculate_percentage(75, 100, 2) as completion_pct",
+                        "expected": "75.00",
                     }
-                ]
+                ],
             ),
-            
-            'safe_division': SQLFunction(
-                name='safe_division',
-                description='Safe division with null handling',
+            "safe_division": SQLFunction(
+                name="safe_division",
+                description="Safe division with null handling",
                 sql_definition="""
 CREATE OR REPLACE FUNCTION safe_division(
     numerator DECIMAL(10,2),
@@ -287,22 +288,21 @@ CREATE OR REPLACE FUNCTION safe_division(
     END
 $$;
 """,
-                parameters=['numerator', 'denominator', 'default_value'],
-                return_type='DECIMAL(10,2)',
-                category='numeric',
-                tags=['division', 'null_safe', 'calculation'],
+                parameters=["numerator", "denominator", "default_value"],
+                return_type="DECIMAL(10,2)",
+                category="numeric",
+                tags=["division", "null_safe", "calculation"],
                 examples=[
                     {
-                        'description': 'Safe division with default value',
-                        'usage': "SELECT safe_division(10, 0, 0) as result",
-                        'expected': '0'
+                        "description": "Safe division with default value",
+                        "usage": "SELECT safe_division(10, 0, 0) as result",
+                        "expected": "0",
                     }
-                ]
+                ],
             ),
-            
-            'is_in_range': SQLFunction(
-                name='is_in_range',
-                description='Check if value is within specified range',
+            "is_in_range": SQLFunction(
+                name="is_in_range",
+                description="Check if value is within specified range",
                 sql_definition="""
 CREATE OR REPLACE FUNCTION is_in_range(
     value DECIMAL(10,2),
@@ -317,26 +317,26 @@ CREATE OR REPLACE FUNCTION is_in_range(
     END
 $$;
 """,
-                parameters=['value', 'min_value', 'max_value', 'include_bounds'],
-                return_type='BOOLEAN',
-                category='numeric',
-                tags=['range', 'validation', 'boolean'],
+                parameters=["value", "min_value", "max_value", "include_bounds"],
+                return_type="BOOLEAN",
+                category="numeric",
+                tags=["range", "validation", "boolean"],
                 examples=[
                     {
-                        'description': 'Check if amount is in valid range',
-                        'usage': "SELECT is_in_range(100, 0, 1000, TRUE) as is_valid",
-                        'expected': 'TRUE'
+                        "description": "Check if amount is in valid range",
+                        "usage": "SELECT is_in_range(100, 0, 1000, TRUE) as is_valid",
+                        "expected": "TRUE",
                     }
-                ]
-            )
+                ],
+            ),
         }
-    
+
     def _get_quality_functions(self) -> Dict[str, SQLFunction]:
         """Get data quality functions."""
         return {
-            'data_quality_score': SQLFunction(
-                name='data_quality_score',
-                description='Calculate data quality score based on multiple checks',
+            "data_quality_score": SQLFunction(
+                name="data_quality_score",
+                description="Calculate data quality score based on multiple checks",
                 sql_definition="""
 CREATE OR REPLACE FUNCTION data_quality_score(
     completeness_score DECIMAL(3,2),
@@ -353,22 +353,27 @@ CREATE OR REPLACE FUNCTION data_quality_score(
     )
 $$;
 """,
-                parameters=['completeness_score', 'accuracy_score', 'consistency_score', 'validity_score', 'weights'],
-                return_type='DECIMAL(3,2)',
-                category='quality',
-                tags=['quality_score', 'calculation', 'weighted'],
+                parameters=[
+                    "completeness_score",
+                    "accuracy_score",
+                    "consistency_score",
+                    "validity_score",
+                    "weights",
+                ],
+                return_type="DECIMAL(3,2)",
+                category="quality",
+                tags=["quality_score", "calculation", "weighted"],
                 examples=[
                     {
-                        'description': 'Calculate overall data quality score',
-                        'usage': "SELECT data_quality_score(0.95, 0.90, 0.85, 0.92) as quality_score",
-                        'expected': '0.91'
+                        "description": "Calculate overall data quality score",
+                        "usage": "SELECT data_quality_score(0.95, 0.90, 0.85, 0.92) as quality_score",
+                        "expected": "0.91",
                     }
-                ]
+                ],
             ),
-            
-            'null_percentage': SQLFunction(
-                name='null_percentage',
-                description='Calculate percentage of null values in a column',
+            "null_percentage": SQLFunction(
+                name="null_percentage",
+                description="Calculate percentage of null values in a column",
                 sql_definition="""
 CREATE OR REPLACE FUNCTION null_percentage(
     column_value STRING
@@ -379,26 +384,26 @@ CREATE OR REPLACE FUNCTION null_percentage(
     END
 $$;
 """,
-                parameters=['column_value'],
-                return_type='DECIMAL(5,2)',
-                category='quality',
-                tags=['null_check', 'percentage', 'quality'],
+                parameters=["column_value"],
+                return_type="DECIMAL(5,2)",
+                category="quality",
+                tags=["null_check", "percentage", "quality"],
                 examples=[
                     {
-                        'description': 'Check null percentage for a column',
-                        'usage': "SELECT AVG(null_percentage(customer_name)) as null_pct FROM customers",
-                        'expected': 'Average null percentage'
+                        "description": "Check null percentage for a column",
+                        "usage": "SELECT AVG(null_percentage(customer_name)) as null_pct FROM customers",
+                        "expected": "Average null percentage",
                     }
-                ]
-            )
+                ],
+            ),
         }
-    
+
     def _get_business_functions(self) -> Dict[str, SQLFunction]:
         """Get business logic functions."""
         return {
-            'customer_segment': SQLFunction(
-                name='customer_segment',
-                description='Segment customers based on total spend',
+            "customer_segment": SQLFunction(
+                name="customer_segment",
+                description="Segment customers based on total spend",
                 sql_definition="""
 CREATE OR REPLACE FUNCTION customer_segment(
     total_spend DECIMAL(10,2)
@@ -411,22 +416,21 @@ CREATE OR REPLACE FUNCTION customer_segment(
     END
 $$;
 """,
-                parameters=['total_spend'],
-                return_type='STRING',
-                category='business',
-                tags=['segmentation', 'customer', 'business_logic'],
+                parameters=["total_spend"],
+                return_type="STRING",
+                category="business",
+                tags=["segmentation", "customer", "business_logic"],
                 examples=[
                     {
-                        'description': 'Segment customer by spend',
-                        'usage': "SELECT customer_segment(7500) as segment",
-                        'expected': "'Gold'"
+                        "description": "Segment customer by spend",
+                        "usage": "SELECT customer_segment(7500) as segment",
+                        "expected": "'Gold'",
                     }
-                ]
+                ],
             ),
-            
-            'order_status': SQLFunction(
-                name='order_status',
-                description='Determine order status based on business rules',
+            "order_status": SQLFunction(
+                name="order_status",
+                description="Determine order status based on business rules",
                 sql_definition="""
 CREATE OR REPLACE FUNCTION order_status(
     order_date DATE,
@@ -443,67 +447,71 @@ CREATE OR REPLACE FUNCTION order_status(
     END
 $$;
 """,
-                parameters=['order_date', 'ship_date', 'delivery_date', 'cancel_date'],
-                return_type='STRING',
-                category='business',
-                tags=['order_status', 'business_logic', 'status'],
+                parameters=["order_date", "ship_date", "delivery_date", "cancel_date"],
+                return_type="STRING",
+                category="business",
+                tags=["order_status", "business_logic", "status"],
                 examples=[
                     {
-                        'description': 'Determine order status',
-                        'usage': "SELECT order_status('2024-01-01', '2024-01-02', NULL, NULL) as status",
-                        'expected': "'Shipped'"
+                        "description": "Determine order status",
+                        "usage": "SELECT order_status('2024-01-01', '2024-01-02', NULL, NULL) as status",
+                        "expected": "'Shipped'",
                     }
-                ]
-            )
+                ],
+            ),
         }
-    
+
     def get_function(self, function_name: str) -> Optional[SQLFunction]:
         """Get a specific SQL function by name."""
         return self.functions.get(function_name)
-    
+
     def list_functions(self, category: Optional[str] = None) -> List[SQLFunction]:
         """List all functions, optionally filtered by category."""
         if category:
             return [f for f in self.functions.values() if f.category == category]
         return list(self.functions.values())
-    
-    def render_function_definition(self, function_name: str, parameters: Dict[str, Any] = None) -> str:
+
+    def render_function_definition(
+        self, function_name: str, parameters: Dict[str, Any] = None
+    ) -> str:
         """Render a SQL function definition."""
         function = self.get_function(function_name)
         if not function:
             raise ValueError(f"Function '{function_name}' not found")
-        
+
         return function.sql_definition
-    
+
     def get_function_examples(self, function_name: str) -> List[Dict[str, Any]]:
         """Get examples for a specific function."""
         function = self.get_function(function_name)
         return function.examples if function else []
-    
+
     def search_functions(self, query: str) -> List[SQLFunction]:
         """Search functions by name, description, or tags."""
         query_lower = query.lower()
         results = []
-        
+
         for function in self.functions.values():
-            if (query_lower in function.name.lower() or
-                query_lower in function.description.lower() or
-                any(query_lower in tag.lower() for tag in function.tags)):
+            if (
+                query_lower in function.name.lower()
+                or query_lower in function.description.lower()
+                or any(query_lower in tag.lower() for tag in function.tags)
+            ):
                 results.append(function)
-        
+
         return results
-    
+
     def create_function_library(self, output_file: str = None) -> str:
         """Create a complete SQL function library file."""
         library_sql = "-- SQL Function Library\n"
         library_sql += "-- Generated by Databricks Toolkit\n\n"
-        
+
         for function in self.functions.values():
             library_sql += f"-- {function.name}: {function.description}\n"
             library_sql += function.sql_definition + "\n\n"
-        
+
         if output_file:
-            with open(output_file, 'w') as f:
+            with open(output_file, "w") as f:
                 f.write(library_sql)
-        
-        return library_sql 
+
+        return library_sql

@@ -21,7 +21,7 @@ def test_environment_variables():
     """
     # Test that we can access environment variables
     assert os.environ is not None
-    
+
     # Test that we can set and get environment variables
     test_var = "TEST_VAR"
     test_value = "test_value"

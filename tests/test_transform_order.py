@@ -21,13 +21,13 @@ def test_csv_operations():
         # Create test CSV data
         test_file = Path(temp_dir) / "test_orders.csv"
         test_data = "order_id,description\n1,order_one\n2,order_two\n"
-        
+
         with open(test_file, "w") as f:
             f.write(test_data)
-        
+
         # Verify file was created
         assert test_file.exists()
-        
+
         # Verify CSV content
         with open(test_file, "r") as f:
             lines = f.readlines()

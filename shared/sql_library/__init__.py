@@ -15,9 +15,4 @@ from .core.data_quality import DataQualityChecks
 from .core.sql_functions import SQLFunctions
 from .core.sql_templates import SQLTemplates
 
-__all__ = [
-    'SQLPatterns',
-    'DataQualityChecks', 
-    'SQLFunctions',
-    'SQLTemplates'
-] 
+__all__ = ["SQLPatterns", "DataQualityChecks", "SQLFunctions", "SQLTemplates"]

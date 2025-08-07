@@ -20,17 +20,21 @@ except ImportError:
     def log_function_call(func):
         def wrapper(*args, **kwargs):
             return func(*args, **kwargs)
+
         return wrapper
 
 
 class BillingMonitor:
     """Comprehensive billing monitoring for Databricks toolkit."""
-    
-    def __init__(self, project_id: str = "mydatabrickssandbox", 
-                 billing_account_id: str = "01DAC5_0FD782_74837A"):
+
+    def __init__(
+        self,
+        project_id: str = "mydatabrickssandbox",
+        billing_account_id: str = "01DAC5_0FD782_74837A",
+    ):
         """
         Initialize billing monitor.
-        
+
         Args:
             project_id: Google Cloud project ID
             billing_account_id: Billing account ID (with underscores, not hyphens)
@@ -38,13 +42,15 @@ class BillingMonitor:
         self.project_id = project_id
         self.billing_account_id = billing_account_id
         self.bq_client = bigquery.Client(project=project_id)
-        self.table_name = f"billing_export.gcp_billing_export_resource_v1_{billing_account_id}"
-        
+        self.table_name = (
+            f"billing_export.gcp_billing_export_resource_v1_{billing_account_id}"
+        )
+
     @log_function_call
     def test_connection(self) -> pd.DataFrame:
         """
         Test connection and get table schema.
-        
+
         Returns:
             DataFrame with sample data
         """
@@ -53,18 +59,18 @@ class BillingMonitor:
         FROM `{self.project_id}.{self.table_name}`
         LIMIT 5
         """
-        
+
         return self.bq_client.query(query).to_dataframe()
-    
+
     @log_function_call
     def get_monthly_costs(self, year: int = 2025, month: int = 7) -> pd.DataFrame:
         """
         Get monthly cost breakdown.
-        
+
         Args:
             year: Year to query (default: 2025)
             month: Month to query 1-12 (default: 7 for July)
-            
+
         Returns:
             DataFrame with monthly cost data
         """
@@ -82,18 +88,18 @@ class BillingMonitor:
         GROUP BY service.description
         ORDER BY Monthly_Cost DESC
         """
-        
+
         return self.bq_client.query(query).to_dataframe()
-    
+
     @log_function_call
     def get_databricks_costs(self, start_date: str, end_date: str) -> pd.DataFrame:
         """
         Get Databricks-specific costs.
-        
+
         Args:
             start_date: Start date in format 'YYYY-MM-DD'
             end_date: End date in format 'YYYY-MM-DD'
-            
+
         Returns:
             DataFrame with Databricks cost data
         """
@@ -123,18 +129,18 @@ class BillingMonitor:
         GROUP BY Day, service.description
         ORDER BY Day DESC, Daily_Cost DESC
         """
-        
+
         return self.bq_client.query(query).to_dataframe()
-    
+
     @log_function_call
     def get_daily_costs(self, start_date: str, end_date: str) -> pd.DataFrame:
         """
         Get detailed daily cost breakdown.
-        
+
         Args:
             start_date: Start date in format 'YYYY-MM-DD'
             end_date: End date in format 'YYYY-MM-DD'
-            
+
         Returns:
             DataFrame with daily cost data
         """
@@ -201,82 +207,90 @@ class BillingMonitor:
           Day DESC,
           Subtotal DESC
         """
-        
+
         return self.bq_client.query(query).to_dataframe()
-    
+
     @log_function_call
     def check_cost_threshold(self, threshold: float = 100.0) -> Dict[str, Any]:
         """
         Check if current month costs exceed threshold.
-        
+
         Args:
             threshold: Cost threshold in dollars
-            
+
         Returns:
             Dict with cost status and alerts
         """
         now = datetime.now()
         df = self.get_monthly_costs(now.year, now.month)
-        
-        total_cost = df['Monthly_Cost'].sum()
-        databricks_cost = df[df['description'].isin([
-            'Compute Engine', 'Cloud Storage', 'BigQuery', 
-            'Cloud Logging', 'Cloud Monitoring', 'Cloud Network'
-        ])]['Monthly_Cost'].sum()
-        
+
+        total_cost = df["Monthly_Cost"].sum()
+        databricks_cost = df[
+            df["description"].isin(
+                [
+                    "Compute Engine",
+                    "Cloud Storage",
+                    "BigQuery",
+                    "Cloud Logging",
+                    "Cloud Monitoring",
+                    "Cloud Network",
+                ]
+            )
+        ]["Monthly_Cost"].sum()
+
         return {
-            'total_cost': total_cost,
-            'databricks_cost': databricks_cost,
-            'threshold_exceeded': total_cost > threshold,
-            'databricks_threshold_exceeded': databricks_cost > threshold * 0.8,
-            'alert': total_cost > threshold,
-            'services': df.to_dict('records')
+            "total_cost": total_cost,
+            "databricks_cost": databricks_cost,
+            "threshold_exceeded": total_cost > threshold,
+            "databricks_threshold_exceeded": databricks_cost > threshold * 0.8,
+            "alert": total_cost > threshold,
+            "services": df.to_dict("records"),
         }
-    
+
     @log_function_call
     def generate_cost_report(self, year: int, month: int) -> Dict[str, Any]:
         """
         Generate comprehensive cost report.
-        
+
         Args:
             year: Year to report on
             month: Month to report on
-            
+
         Returns:
             Dict with cost report data
         """
         monthly_df = self.get_monthly_costs(year, month)
-        
+
         # Get date range for the month
         start_date = f"{year}-{month:02d}-01"
         if month == 12:
             end_date = f"{year + 1}-01-01"
         else:
             end_date = f"{year}-{month + 1:02d}-01"
-        
+
         daily_df = self.get_daily_costs(start_date, end_date)
         databricks_df = self.get_databricks_costs(start_date, end_date)
-        
+
         return {
-            'month': month,
-            'year': year,
-            'total_cost': monthly_df['Monthly_Cost'].sum(),
-            'databricks_cost': databricks_df['Daily_Cost'].sum(),
-            'services': monthly_df.to_dict('records'),
-            'daily_breakdown': daily_df.to_dict('records'),
-            'databricks_breakdown': databricks_df.to_dict('records'),
-            'cost_alerts': self.check_cost_threshold()
+            "month": month,
+            "year": year,
+            "total_cost": monthly_df["Monthly_Cost"].sum(),
+            "databricks_cost": databricks_df["Daily_Cost"].sum(),
+            "services": monthly_df.to_dict("records"),
+            "daily_breakdown": daily_df.to_dict("records"),
+            "databricks_breakdown": databricks_df.to_dict("records"),
+            "cost_alerts": self.check_cost_threshold(),
         }
-    
+
     @log_function_call
     def test_simple_query(self, year: int, month: int) -> pd.DataFrame:
         """
         Test a simple query to debug the GROUP BY issue.
-        
+
         Args:
             year: Year to query
             month: Month to query (1-12)
-            
+
         Returns:
             DataFrame with test data
         """
@@ -293,17 +307,17 @@ class BillingMonitor:
         ORDER BY total_cost DESC
         LIMIT 10
         """
-        
+
         return self.bq_client.query(query).to_dataframe()
-    
+
     def export_to_csv(self, df: pd.DataFrame, filename: str) -> str:
         """
         Export DataFrame to CSV.
-        
+
         Args:
             df: DataFrame to export
             filename: Output filename
-            
+
         Returns:
             Path to exported file
         """
@@ -315,35 +329,37 @@ class BillingMonitor:
 
 class BillingCLI:
     """CLI interface for billing monitoring."""
-    
+
     def __init__(self, monitor: BillingMonitor):
         self.monitor = monitor
-    
-    def run_monthly_report(self, year: int, month: int, output_file: Optional[str] = None):
+
+    def run_monthly_report(
+        self, year: int, month: int, output_file: Optional[str] = None
+    ):
         """Run monthly cost report."""
         df = self.monitor.get_monthly_costs(year, month)
-        
+
         if output_file:
             self.monitor.export_to_csv(df, output_file)
             print(f"✅ Report exported to: {output_file}")
-        
+
         print(f"\n📊 Monthly Cost Report - {year}-{month:02d}")
         print("=" * 50)
         print(df.to_string(index=False))
-        
-        total_cost = df['Monthly_Cost'].sum()
+
+        total_cost = df["Monthly_Cost"].sum()
         print(f"\n💰 Total Cost: ${total_cost:.2f}")
-    
+
     def run_cost_check(self, threshold: float = 100.0):
         """Check current month costs against threshold."""
         status = self.monitor.check_cost_threshold(threshold)
-        
+
         print(f"\n🔍 Cost Threshold Check (${threshold})")
         print("=" * 40)
         print(f"Total Cost: ${status['total_cost']:.2f}")
         print(f"Databricks Cost: ${status['databricks_cost']:.2f}")
-        
-        if status['alert']:
+
+        if status["alert"]:
             print("🚨 ALERT: Cost threshold exceeded!")
         else:
             print("✅ Costs within threshold")
@@ -351,34 +367,37 @@ class BillingCLI:
 
 class BillingDashboard:
     """Dashboard integration for billing data."""
-    
+
     def __init__(self, monitor: BillingMonitor):
         self.monitor = monitor
-    
+
     def get_dashboard_data(self) -> Dict[str, Any]:
         """Get data for dashboard display."""
         now = datetime.now()
-        
+
         # Current month data
         current_month = self.monitor.get_monthly_costs(now.year, now.month)
-        
+
         # Last 7 days
-        end_date = now.strftime('%Y-%m-%d')
-        start_date = (now - timedelta(days=7)).strftime('%Y-%m-%d')
+        end_date = now.strftime("%Y-%m-%d")
+        start_date = (now - timedelta(days=7)).strftime("%Y-%m-%d")
         last_7_days = self.monitor.get_daily_costs(start_date, end_date)
-        
+
         # Cost threshold check
         threshold_status = self.monitor.check_cost_threshold()
-        
+
         return {
-            'current_month': current_month.to_dict('records'),
-            'last_7_days': last_7_days.to_dict('records'),
-            'threshold_status': threshold_status,
-            'summary': {
-                'total_monthly_cost': current_month['Monthly_Cost'].sum(),
-                'databricks_cost': sum(row['Daily_Cost'] for row in last_7_days.to_dict('records') 
-                                     if row['Service'] in ['Compute Engine', 'Cloud Storage']),
-                'days_with_costs': len(last_7_days['Day'].unique()),
-                'alert_status': threshold_status['alert']
-            }
+            "current_month": current_month.to_dict("records"),
+            "last_7_days": last_7_days.to_dict("records"),
+            "threshold_status": threshold_status,
+            "summary": {
+                "total_monthly_cost": current_month["Monthly_Cost"].sum(),
+                "databricks_cost": sum(
+                    row["Daily_Cost"]
+                    for row in last_7_days.to_dict("records")
+                    if row["Service"] in ["Compute Engine", "Cloud Storage"]
+                ),
+                "days_with_costs": len(last_7_days["Day"].unique()),
+                "alert_status": threshold_status["alert"],
+            },
         }
