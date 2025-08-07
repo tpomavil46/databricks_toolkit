@@ -12,13 +12,20 @@ Requirements:
 """
 
 import os
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 from datetime import datetime, timedelta
 import pandas as pd
+import requests
+from google.auth import default
+from google.auth.transport.requests import Request
 
-# Import Google Cloud Billing API
 try:
-    from google.cloud import billing_v1
+    from google.cloud import bigquery  # type: ignore
+except ImportError:
+    bigquery = None  # type: ignore
+
+try:
+    from google.cloud import billing_v1  # type: ignore
 except ImportError:
     billing_v1 = None  # type: ignore
 
@@ -41,11 +48,11 @@ class CloudBillingAPI:
     def _initialize_client(self):
         """Initialize the Cloud Billing API client."""
         try:
-            from google.cloud import billing_v1
-            from google.auth import default
+            if billing_v1 is None:
+                raise ImportError("Cloud Billing API not available")
 
             # Get credentials
-            credentials, project = default()
+            credentials, _ = default()
 
             # Initialize billing client
             self.client = billing_v1.CloudBillingClient(credentials=credentials)
@@ -57,7 +64,7 @@ class CloudBillingAPI:
             print(
                 "❌ Cloud Billing API not available. Install with: pip install google-cloud-billing"
             )
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             print(f"❌ Error initializing Cloud Billing API: {e}")
 
     def _get_billing_account(self):
@@ -78,7 +85,7 @@ class CloudBillingAPI:
 
             print("❌ No open billing account found")
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             print(f"❌ Error getting billing account: {e}")
 
     def is_configured(self) -> bool:
@@ -119,7 +126,7 @@ class CloudBillingAPI:
                 print("⚠️ No current month costs found")
                 return {}
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             print(f"❌ Error getting current month costs: {e}")
             return {}
 
@@ -165,16 +172,19 @@ class CloudBillingAPI:
 
                 return costs
 
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001
                 print(f"❌ Error querying billing account: {e}")
                 return {}
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             print(f"❌ Error querying Cloud Billing API: {e}")
             return {}
 
     def _get_costs_from_billing_account(
-        self, billing_account_name: str, start_date: datetime, end_date: datetime
+        self,
+        billing_account_name: str,
+        start_date: datetime,
+        end_date: datetime,  # noqa: ARG002
     ) -> Dict[str, float]:
         """
         Get costs from billing account using the Cloud Billing API.
@@ -214,13 +224,13 @@ class CloudBillingAPI:
                     )
                     if service_costs > 0:
                         costs[service] = service_costs
-                except Exception as e:
+                except Exception as e:  # noqa: BLE001
                     print(f"⚠️ Error getting costs for {service}: {e}")
                     continue
 
             return costs
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             print(f"❌ Error getting costs from billing account: {e}")
             return {}
 
@@ -238,12 +248,9 @@ class CloudBillingAPI:
 
             # Use the actual Cloud Billing API REST endpoint
             # GET /v1/services - Lists all public cloud services
-            import requests
-            from google.auth.transport.requests import Request
-            from google.auth import default
 
             # Get credentials
-            credentials, project = default()
+            credentials, _ = default()
 
             # Create authenticated session
             session = requests.Session()
@@ -277,12 +284,12 @@ class CloudBillingAPI:
                 )
                 return []
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             print(f"❌ Error getting services from Cloud Billing API: {e}")
             return []
 
     def _get_service_costs_from_api(
-        self, service_id: str, billing_account_name: str
+        self, service_id: str, billing_account_name: str  # noqa: ARG002
     ) -> float:
         """
         Get costs for a specific service using Cloud Billing API.
@@ -296,13 +303,11 @@ class CloudBillingAPI:
         """
         try:
             # Use the actual Cloud Billing API REST endpoint
-            # GET /v1/{parent=services/*}/skus - Lists all publicly available SKUs for a given cloud service
-            import requests
-            from google.auth.transport.requests import Request
-            from google.auth import default
+            # GET /v1/{parent=services/*}/skus - Lists all publicly available SKUs for a
+            # given cloud service
 
             # Get credentials
-            credentials, project = default()
+            credentials, _ = default()
 
             # Create authenticated session
             session = requests.Session()
@@ -334,11 +339,13 @@ class CloudBillingAPI:
                 )
                 return 0.0
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             print(f"❌ Error getting costs for service {service_id}: {e}")
             return 0.0
 
-    def get_service_costs(self, service_name: str, days: int = 30) -> pd.DataFrame:
+    def get_service_costs(
+        self, service_name: str, days: int = 30
+    ) -> pd.DataFrame:  # noqa: ARG002
         """
         Get costs for a specific service over a time period using Cloud Billing API.
 
@@ -376,12 +383,15 @@ class CloudBillingAPI:
                 print(f"❌ No data found for {service_name} via Cloud Billing API")
                 return pd.DataFrame()
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             print(f"❌ Error getting {service_name} costs via Cloud Billing API: {e}")
             return pd.DataFrame()
 
     def _get_service_costs_from_bigquery(
-        self, service_name: str, start_date: datetime, end_date: datetime
+        self,
+        service_name: str,
+        start_date: datetime,
+        end_date: datetime,  # noqa: ARG002
     ) -> pd.DataFrame:
         """
         Get service-specific costs from BigQuery billing export.
@@ -395,8 +405,8 @@ class CloudBillingAPI:
             DataFrame with daily costs for the service
         """
         try:
-            from google.cloud import bigquery
-            from google.auth import default
+            if bigquery is None:
+                raise ImportError("BigQuery client not available")
 
             # Get credentials
             credentials, project = default()
@@ -473,14 +483,14 @@ class CloudBillingAPI:
                         )
                         return pd.DataFrame(data)
 
-                except Exception as e:
+                except Exception as e:  # noqa: BLE001
                     print(f"⚠️ Error querying {service_name} from {table_name}: {e}")
                     continue
 
             print(f"⚠️ No data found for {service_name} in any billing export table")
             return pd.DataFrame()
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             print(f"❌ Error getting {service_name} costs from BigQuery: {e}")
             return pd.DataFrame()
 
@@ -495,8 +505,6 @@ class CloudBillingAPI:
             Dict mapping service names to total costs
         """
         try:
-            from datetime import datetime, timedelta
-
             end_date = datetime.now()
             start_date = end_date - timedelta(days=days)
 
@@ -519,7 +527,7 @@ class CloudBillingAPI:
                 print("⚠️ No historical costs found via Cloud Billing API")
                 return {}
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             print(f"❌ Error getting historical costs via Cloud Billing API: {e}")
             return {}
 
@@ -542,7 +550,7 @@ class CloudBillingAPI:
             print("⚠️ Detailed cost breakdown not yet implemented")
             return {}
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             print(f"❌ Error getting cost breakdown: {e}")
             return {}
 
