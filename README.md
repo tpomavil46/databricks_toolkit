@@ -1,6 +1,6 @@
 # Databricks Toolkit
 
-A comprehensive toolkit for Databricks development with support for both SQL-driven and PySpark ETL workflows.
+A comprehensive toolkit for Databricks development with support for both SQL-driven and PySpark ETL workflows, plus integrated GCP cost monitoring.
 
 ## 🏗️ Architecture
 
@@ -25,8 +25,15 @@ databricks_toolkit/
 │       ├── config/             # PySpark workflow configuration
 │       └── examples/           # PySpark workflow examples
 │
+├── dashboard/                    # 📊 UNIFIED DASHBOARD
+│   ├── dynamic_dashboard.py    # Main dashboard with GCP integration
+│   ├── cloud_integrations.py   # GCP and Databricks integrations
+│   ├── config.py               # Dashboard configuration
+│   └── saved_dashboards/       # Saved dashboard configurations
+│
 ├── shared/                      # 🔧 SHARED COMPONENTS
 │   ├── cli/                    # Command-line tools
+│   │   └── monitoring/         # GCP cost monitoring CLI
 │   ├── admin/                  # Administrative tools
 │   ├── utils/                  # Shared utilities
 │   ├── sql_library/            # SQL library components
@@ -56,32 +63,42 @@ databricks_toolkit/
 
 ## 🚀 Quick Start
 
-### Choose Your Workflow
+### 🎯 **Unified Dashboard (Recommended)**
 
-**SQL-Driven Workflow** - For SQL-first development:
+The main dashboard provides both business analytics and GCP cost monitoring:
+
 ```bash
-# Run SQL workflow for retail project
-python main.py sql retail
+# Launch the unified dashboard
+streamlit run dashboard/dynamic_dashboard.py
 
-# Run with specific environment
-python main.py sql ecommerce --environment prod
-
-# Run DLT pipeline with Auto Loader
-python workflows/sql_driven/run.py retail --pipeline-type dlt --source-path /path/to/data
+# Or use the launcher script
+python run_dashboard.py
 ```
 
-**PySpark ETL Workflow** - For Python-first development:
-```bash
-# Run PySpark ETL workflow
-python main.py pyspark data_ingestion
+**Dashboard Features:**
+- **☁️ GCP Dashboard**: Real-time GCP cost monitoring with BigQuery, Cloud Storage, and Dataproc analytics
+- **📊 Business Analytics**: Table discovery, chart building, and pipeline visualization
+- **🏗️ Pipeline Builder**: Build and visualize data pipelines with Bronze → Silver → Gold architecture
+- **💾 Dashboard Management**: Save and load custom dashboard configurations
 
-# Run with specific environment
-python main.py pyspark transformation --environment staging
-```
+**Access the Dashboard:**
+- **URL**: http://localhost:8501
+- **GCP Mode**: Click "☁️ GCP Dashboard" in the sidebar
+- **Business Mode**: Click "📊 Business Analytics" in the sidebar
 
-**List Available Workflows**:
+### 🎯 **GCP Cost Monitoring CLI**
+
+Monitor GCP costs directly from the command line:
+
 ```bash
-python main.py list
+# Get current cost breakdown
+python shared/cli/monitoring/gcp_cost_cli.py --project-id mydatabrickssandbox
+
+# Get cost trends over time
+python shared/cli/monitoring/gcp_cost_cli.py --project-id mydatabrickssandbox --trends
+
+# Export results as JSON
+python shared/cli/monitoring/gcp_cost_cli.py --project-id mydatabrickssandbox --output json
 ```
 
 ### 🎯 **DLT and Auto Loader Support**

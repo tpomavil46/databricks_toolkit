@@ -1,246 +1,286 @@
-# 📊 Retail Analytics Dashboard
+# Dashboard Documentation
 
-A comprehensive Streamlit dashboard with Plotly visualizations for the Delta Live Tables retail analytics pipeline.
+The unified dashboard provides comprehensive analytics and monitoring capabilities for both business data and GCP cost management.
 
-## 🚀 Features
+## 🚀 Quick Start
 
-### 📈 Visualizations
-- **Revenue Analysis**: Bar charts showing revenue by category
-- **Product Distribution**: Pie charts for product categories
-- **Data Quality Metrics**: Quality score tracking
-- **Time Series**: Revenue trends over time
-- **Hourly Analysis**: Revenue and product patterns by hour
-- **Pipeline Architecture**: Interactive diagram of the DLT pipeline
+### Launch the Dashboard
 
-### 🎛️ Interactive Controls
-- **Date Range Filter**: Select specific time periods
-- **Category Filter**: Filter by product categories
-- **Product Category Filter**: Filter by value tiers
-- **Real-time Updates**: Live data refresh capabilities
-
-### 📊 Key Metrics
-- Total Revenue with average comparison
-- Total Products with average count
-- Average Price with standard deviation
-- Data Quality Score percentage
-
-## 🛠️ Installation
-
-### Prerequisites
-- Python 3.8+
-- pip package manager
-
-### Setup
-1. **Install Dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. **Launch Dashboard**:
-   ```bash
-   # From project root
-   python run_dashboard.py
-   
-   # Or directly with Streamlit
-   streamlit run dashboard/app.py
-   ```
-
-3. **Access Dashboard**:
-   - Open your browser to `http://localhost:8501`
-   - The dashboard will load automatically
-
-## 📋 Dashboard Components
-
-### 1. Pipeline Architecture Diagram
-- Visual representation of the Delta Live Tables pipeline
-- Shows Bronze → Silver → Gold data flow
-- Highlights key features of each layer
-
-### 2. Revenue Analytics
-- **Total Revenue by Category**: Bar chart showing revenue distribution
-- **Product Distribution**: Pie chart of product categories
-- **Revenue Trend**: Line chart showing daily revenue patterns
-- **Hourly Analysis**: Dual-axis chart for revenue and product counts
-
-### 3. Data Quality Metrics
-- **Quality Score**: Percentage of valid records
-- **Validation Metrics**: Breakdown of data quality checks
-- **Category Performance**: Quality metrics by product category
-
-### 4. Interactive Filters
-- **Date Range**: Select specific time periods
-- **Category Filter**: Filter by product categories
-- **Product Category**: Filter by value tiers (high/medium/low)
-
-## 🔧 Customization
-
-### Adding New Visualizations
-1. Create a new function in `app.py`:
-   ```python
-   def create_new_chart(df):
-       # Your visualization code here
-       return fig
-   ```
-
-2. Add the chart to the main layout:
-   ```python
-   new_chart = create_new_chart(df)
-   st.plotly_chart(new_chart, use_container_width=True)
-   ```
-
-### Connecting to Real Data
-1. Replace `create_sample_data()` with your data source
-2. Update the data loading logic in `main()`
-3. Modify filters to match your data schema
-
-### Styling Customization
-- Edit the CSS in the `st.markdown()` section
-- Modify color schemes in Plotly charts
-- Update layout parameters for different screen sizes
-
-## 📊 Data Schema
-
-The dashboard expects data with the following columns:
-
-```python
-{
-    'id': int,                    # Product ID
-    'name': str,                  # Product name
-    'category': str,              # Product category
-    'product_category': str,      # Value tier (high/medium/low)
-    'total_revenue': float,       # Revenue amount
-    'avg_price': float,           # Average price
-    'total_products': int,        # Product count
-    'high_value_products': int,   # High-value product count
-    'medium_value_products': int, # Medium-value product count
-    'low_value_products': int,    # Low-value product count
-    'valid_date_products': int,   # Valid date count
-    'valid_price_products': int,  # Valid price count
-    'high_value_revenue': float,  # High-value revenue
-    'medium_value_revenue': float,# Medium-value revenue
-    'low_value_revenue': float,   # Low-value revenue
-    'order_date': datetime,       # Order date
-    'order_hour': int            # Order hour (0-23)
-}
-```
-
-## 🚀 Deployment
-
-### Local Development
 ```bash
-# Install dependencies
-pip install -r requirements.txt
+# Method 1: Direct streamlit run (recommended)
+streamlit run dashboard/dynamic_dashboard.py
 
-# Run dashboard
-streamlit run dashboard/app.py
+# Method 2: Using the launcher script
+python run_dashboard.py
+
+# Method 3: From project root
+cd /path/to/databricks_toolkit
+streamlit run dashboard/dynamic_dashboard.py
 ```
 
-### Production Deployment
-1. **Docker**:
-   ```dockerfile
-   FROM python:3.9-slim
-   COPY requirements.txt .
-   RUN pip install -r requirements.txt
-   COPY dashboard/ .
-   EXPOSE 8501
-   CMD ["streamlit", "run", "app.py", "--server.port=8501"]
-   ```
+**Dashboard URL**: http://localhost:8501
 
-2. **Cloud Platforms**:
-   - **Heroku**: Deploy with `Procfile`
-   - **AWS**: Use Elastic Beanstalk or ECS
-   - **GCP**: Deploy to App Engine
-   - **Azure**: Use App Service
+## 📊 Dashboard Modes
 
-### Environment Variables
-```bash
-# Optional: Set custom port
-export STREAMLIT_SERVER_PORT=8501
+### ☁️ GCP Dashboard Mode
 
-# Optional: Set custom address
-export STREAMLIT_SERVER_ADDRESS=0.0.0.0
-```
+Access real-time GCP cost monitoring and analytics:
 
-## 🔗 Integration with DLT Pipeline
+**Features:**
+- **BigQuery Cost Monitoring**: Query costs, data processed, usage trends
+- **Cloud Storage Analytics**: Storage costs, operations, data volume
+- **Dataproc Monitoring**: Cluster costs, job counts, compute hours
+- **Cost Optimization**: Smart recommendations based on usage patterns
+- **Real vs Sample Data**: Clear indicators for data source
 
-This dashboard is designed to work with the Delta Live Tables pipeline:
+**Navigation:**
+- Click "☁️ GCP Dashboard" button in the sidebar
+- View cost trends and breakdowns
+- Get optimization recommendations
 
-1. **Bronze Layer**: Raw data ingestion with Auto Loader
-2. **Silver Layer**: Data transformation with quality checks
-3. **Gold Layer**: Real-time analytics and aggregations
-4. **Dashboard**: Interactive visualizations and monitoring
+### 📊 Business Analytics Mode
 
-### Pipeline Features
-- **Auto Loader**: Automatic file detection and schema inference
-- **Streaming Tables**: Real-time data processing
-- **Materialized Views**: Pre-computed aggregations
-- **Data Quality**: Built-in validation and constraints
+Build custom analytics dashboards:
 
-## 📈 Performance Optimization
+**Features:**
+- **Table Discovery**: Find and explore Databricks tables
+- **Chart Builder**: Create custom visualizations
+- **Pipeline Builder**: Build Bronze → Silver → Gold pipelines
+- **Dashboard Management**: Save and load configurations
 
-### For Large Datasets
-1. **Data Sampling**: Use `df.sample()` for large datasets
-2. **Caching**: Implement `@st.cache_data` for expensive operations
-3. **Pagination**: Load data in chunks for better performance
-4. **Aggregation**: Pre-compute metrics at the database level
+**Navigation:**
+- Click "📊 Business Analytics" button in the sidebar
+- Use Chart Builder or Pipeline Builder modes
 
-### Memory Management
-```python
-# Use efficient data types
-df = df.astype({
-    'id': 'int32',
-    'total_revenue': 'float32',
-    'order_date': 'datetime64[ns]'
-})
+## 🎯 Dashboard Components
 
-# Clear cache periodically
-st.cache_data.clear()
-```
+### Sidebar Controls
 
-## 🐛 Troubleshooting
+**Quick Actions:**
+- **☁️ GCP Dashboard**: Switch to GCP cost monitoring
+- **📊 Business Analytics**: Switch to business analytics
+- **Mode Indicator**: Shows current active mode
 
-### Common Issues
-1. **Port Already in Use**:
+**Dashboard Management:**
+- Load saved dashboards
+- Save current dashboard configuration
+- Export dashboard settings
+
+**Mode Selection:**
+- **Chart Builder**: Create custom charts and visualizations
+- **Pipeline Builder**: Build and visualize data pipelines
+
+### Main Content Area
+
+**GCP Dashboard:**
+- Configuration status and metrics
+- Cost overview with trends
+- Service-specific analytics
+- Optimization recommendations
+
+**Business Analytics:**
+- Table discovery and selection
+- Chart creation tools
+- Pipeline visualization
+- Data preview and analysis
+
+## 🔧 Configuration
+
+### GCP Setup
+
+1. **Enable BigQuery Billing Export**:
    ```bash
-   # Kill existing process
-   lsof -ti:8501 | xargs kill -9
+   # Go to Google Cloud Console > Billing
+   # Enable Standard usage cost data export to BigQuery
+   # Set destination dataset to 'billing_export'
    ```
 
-2. **Missing Dependencies**:
+2. **Set up Authentication**:
    ```bash
-   pip install --upgrade streamlit plotly pandas numpy
+   gcloud auth application-default login
+   gcloud config set project YOUR_PROJECT_ID
    ```
 
-3. **Data Loading Errors**:
-   - Check data schema matches expected format
-   - Verify all required columns are present
-   - Ensure data types are correct
+3. **Environment Variables** (optional):
+   ```bash
+   export GCP_PROJECT_ID="your-project-id"
+   export GCP_SERVICE_ACCOUNT_KEY="path/to/service-account.json"
+   ```
 
-### Debug Mode
+### Databricks Setup
+
+1. **Set Environment Variables**:
+   ```bash
+   export DATABRICKS_WORKSPACE_URL="your-workspace-url"
+   export DATABRICKS_TOKEN="your-access-token"
+   ```
+
+2. **Test Connection**:
+   ```bash
+   python test_dashboard_gcp.py
+   ```
+
+## 📈 GCP Cost Monitoring
+
+### Real Data vs Sample Data
+
+**Sample Data** (when billing export not enabled):
+- Realistic cost simulations
+- Clear "Sample Data" indicators
+- Instructions for enabling real data
+
+**Real Data** (when billing export enabled):
+- Actual BigQuery billing data
+- Real Cloud Storage costs
+- Live Dataproc usage metrics
+
+### Cost Analytics
+
+**BigQuery Analytics:**
+- Query costs and trends
+- Data processed metrics
+- Usage patterns analysis
+
+**Cloud Storage Analytics:**
+- Storage costs by class
+- Operations and bandwidth
+- Lifecycle optimization
+
+**Dataproc Analytics:**
+- Cluster costs and utilization
+- Job performance metrics
+- Auto-scaling recommendations
+
+## 🏗️ Pipeline Builder
+
+### Building Data Pipelines
+
+1. **Select Tables**: Choose from discovered tables
+2. **Define Layers**: Bronze (raw), Silver (cleaned), Gold (aggregated)
+3. **Set Dependencies**: Define data flow relationships
+4. **Visualize**: See the complete pipeline architecture
+
+### Pipeline Components
+
+**Bronze Layer:**
+- Raw data ingestion
+- Initial data validation
+- Source system connections
+
+**Silver Layer:**
+- Data cleaning and transformation
+- Business logic application
+- Quality checks
+
+**Gold Layer:**
+- Aggregated metrics
+- Business KPIs
+- Reporting-ready data
+
+## 💾 Dashboard Management
+
+### Saving Dashboards
+
+1. **Build Your Dashboard**: Create charts and pipelines
+2. **Save Configuration**: Click "Save Dashboard" button
+3. **Name Your Dashboard**: Provide a descriptive name
+4. **Load Later**: Access saved dashboards from sidebar
+
+### Dashboard Features
+
+**Saved Configurations:**
+- Chart layouts and settings
+- Pipeline architectures
+- Data source configurations
+
+**Export/Import:**
+- JSON configuration files
+- Shareable dashboard setups
+- Version control support
+
+## 🧪 Testing
+
+### Test Dashboard Functionality
+
 ```bash
-# Run with debug information
-streamlit run dashboard/app.py --logger.level=debug
+# Test GCP integration
+python test_gcp_dashboard.py
+
+# Test dashboard accessibility
+python test_dashboard_gcp.py
+
+# Test CLI tools
+python shared/cli/monitoring/gcp_cost_cli.py --project-id your-project-id
 ```
 
-## 📚 Resources
+### Troubleshooting
 
-- [Streamlit Documentation](https://docs.streamlit.io/)
-- [Plotly Documentation](https://plotly.com/python/)
-- [Delta Live Tables](https://docs.databricks.com/data-engineering/delta-live-tables/)
-- [Databricks Jobs](https://docs.databricks.com/data-engineering/jobs/)
+**Common Issues:**
 
-## 🤝 Contributing
+1. **Import Errors**:
+   ```bash
+   # Check Python path
+   export PYTHONPATH="${PYTHONPATH}:/path/to/databricks_toolkit"
+   ```
 
-1. Fork the repository
-2. Create a feature branch
-3. Add your changes
-4. Test the dashboard
-5. Submit a pull request
+2. **GCP Authentication**:
+   ```bash
+   # Verify authentication
+   gcloud auth list
+   gcloud config get-value project
+   ```
 
-## 📄 License
+3. **Dashboard Not Loading**:
+   ```bash
+   # Check if dashboard is running
+   curl http://localhost:8501
+   ```
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+## 📚 Advanced Usage
 
----
+### Custom Integrations
 
-**🎯 Perfect for Databricks Data Engineering Associate exam preparation!** 
+**Adding New Data Sources:**
+1. Extend `cloud_integrations.py`
+2. Add new integration class
+3. Update dashboard configuration
+
+**Custom Visualizations:**
+1. Create new chart types
+2. Add to `create_chart()` method
+3. Update chart builder interface
+
+### Performance Optimization
+
+**For Large Datasets:**
+- Use data sampling in preview
+- Implement pagination
+- Cache frequently accessed data
+
+**For Real-time Monitoring:**
+- Set up auto-refresh intervals
+- Use streaming data sources
+- Implement alerting
+
+## 🔗 Related Documentation
+
+- [GCP Cost Monitoring CLI](../shared/cli/monitoring/README.md)
+- [SQL-Driven Workflow](../workflows/sql_driven/README.md)
+- [PySpark ETL Workflow](../workflows/pyspark_etl/README.md)
+- [Configuration Guide](../config/README.md)
+
+## 🆘 Support
+
+For issues or questions:
+
+1. **Check the logs**: Look for error messages in the terminal
+2. **Test components**: Run individual test scripts
+3. **Verify configuration**: Check environment variables and authentication
+4. **Review documentation**: Check related README files
+
+## 🚀 Next Steps
+
+1. **Enable Real GCP Data**: Set up BigQuery billing export
+2. **Customize Dashboards**: Create your own analytics views
+3. **Build Pipelines**: Design Bronze → Silver → Gold architectures
+4. **Monitor Costs**: Track and optimize your GCP spending 

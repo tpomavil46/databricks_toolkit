@@ -2,17 +2,17 @@
 
 VENV_ACTIVATE=.venv/bin/activate
 
-.PHONY: help test test-integration lint format sync \
+.PHONY: help test lint format sync \
         run run-ingest run-pipeline \
         deploy-ingest run-ingest-remote \
         deploy-transform run-transform-remote \
         deploy-pipeline run-pipeline-remote \
-        generate-job clean-remote
+        generate-job clean-remote \
+        billing-costs billing-report billing-check billing-dashboard
 
 help:
 	@echo "Available targets:"
 	@echo "  make test                    Run unit tests"
-	@echo "  make test-integration        Run integration tests"
 	@echo "  make lint                    Run flake8 linter"
 	@echo "  make format                  Auto-format code with black"
 	@echo "  make sync                    Sync GitHub -> Databricks Repos"
@@ -26,14 +26,16 @@ help:
 	@echo "  make run-pipeline-remote JOB_ID=..."
 	@echo "  make clean-remote JOB_ID=..."
 	@echo "  make generate-job JOB=<job>  Generate JSON spec"
+	@echo ""
+	@echo "Billing Monitoring:"
+	@echo "  make billing-costs YEAR=2025 MONTH=8    Get monthly costs"
+	@echo "  make billing-report YEAR=2025 MONTH=8   Generate cost report"
+	@echo "  make billing-check THRESHOLD=100        Check cost threshold"
+	@echo "  make billing-dashboard                   Get dashboard data"
 
 test:
-	@echo "Running unit tests..."
+	@echo "Running tests..."
 	PYTHONPATH=. . $(VENV_ACTIVATE) && pytest tests
-
-test-integration:
-	@echo "Running integration tests..."
-	. $(VENV_ACTIVATE) && python tests/run_integration_tests.py
 
 lint:
 	. $(VENV_ACTIVATE) && flake8
@@ -130,10 +132,43 @@ run-generate-kpis-remote:
 		--profile databricks \
 		--job-id $(JOB_ID)
 
-test-simple: ## Run simple tests (no external dependencies)
-	@echo "Running simple tests..."
-	PYTHONPATH=. python tests/run_simple_tests.py
+# Billing Monitoring Commands
 
-test-ci: ## Run CI tests (for GitHub Actions)
-	@echo "Running CI tests..."
-	PYTHONPATH=. python tests/run_ci_tests.py
+billing-costs:
+	@echo "💰 Getting monthly costs for $(YEAR)-$(MONTH)..."
+	. $(VENV_ACTIVATE) && python -c "
+from utils.billing_monitor import BillingMonitor, BillingCLI
+monitor = BillingMonitor()
+cli = BillingCLI(monitor)
+cli.run_monthly_report($(YEAR), $(MONTH))
+"
+
+billing-report:
+	@echo "📊 Generating comprehensive cost report for $(YEAR)-$(MONTH)..."
+	. $(VENV_ACTIVATE) && python -c "
+from utils.billing_monitor import BillingMonitor
+import json
+monitor = BillingMonitor()
+report = monitor.generate_cost_report($(YEAR), $(MONTH))
+print(json.dumps(report, indent=2, default=str))
+"
+
+billing-check:
+	@echo "🔍 Checking cost threshold ($$(THRESHOLD))..."
+	. $(VENV_ACTIVATE) && python -c "
+from utils.billing_monitor import BillingMonitor, BillingCLI
+monitor = BillingMonitor()
+cli = BillingCLI(monitor)
+cli.run_cost_check($(THRESHOLD))
+"
+
+billing-dashboard:
+	@echo "📈 Getting dashboard data..."
+	. $(VENV_ACTIVATE) && python -c "
+from utils.billing_monitor import BillingMonitor, BillingDashboard
+import json
+monitor = BillingMonitor()
+dashboard = BillingDashboard(monitor)
+data = dashboard.get_dashboard_data()
+print(json.dumps(data, indent=2, default=str))
+"

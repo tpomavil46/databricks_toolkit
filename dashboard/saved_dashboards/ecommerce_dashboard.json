@@ -1,0 +1,123 @@
+{
+  "name": "Ecommerce Dashboard",
+  "title": "Ecommerce Dashboard",
+  "description": "",
+  "pipeline_components": [
+    {
+      "table_name": "default.ecommerce_orders_bronze",
+      "full_name": "timpomaville.default.ecommerce_orders_bronze",
+      "layer_type": "Bronze",
+      "description": "Raw",
+      "depends_on": null,
+      "catalog": "timpomaville",
+      "schema": "default",
+      "table": "ecommerce_orders_bronze"
+    },
+    {
+      "table_name": "default.ecommerce_orders_silver",
+      "full_name": "timpomaville.default.ecommerce_orders_silver",
+      "layer_type": "Silver",
+      "description": "Transformed",
+      "depends_on": "default.ecommerce_orders_bronze",
+      "catalog": "timpomaville",
+      "schema": "default",
+      "table": "ecommerce_orders_silver"
+    },
+    {
+      "table_name": "default.ecommerce_orders_gold",
+      "full_name": "timpomaville.default.ecommerce_orders_gold",
+      "layer_type": "Gold",
+      "description": "Cleaned",
+      "depends_on": "default.ecommerce_orders_silver",
+      "catalog": "timpomaville",
+      "schema": "default",
+      "table": "ecommerce_orders_gold"
+    }
+  ],
+  "layout": {
+    "type": "vertical"
+  },
+  "charts": [
+    {
+      "id": "chart_0_1754519310",
+      "chart_type": "histogram",
+      "x_column": "total_spend",
+      "y_column": null,
+      "color_column": null,
+      "title": "Total Spend Distribution",
+      "table": "timpomaville.default.ecommerce_orders_gold",
+      "layout": {
+        "width": "Full",
+        "position": "Auto",
+        "visible": true
+      },
+      "created_at": "2025-08-06T15:28:30.443760"
+    },
+    {
+      "id": "chart_1_1754534333",
+      "chart_type": "pie_chart",
+      "x_column": "low_value_orders",
+      "y_column": null,
+      "color_column": null,
+      "title": "Low Value Orders",
+      "table": "timpomaville.default.ecommerce_orders_gold",
+      "layout": {
+        "width": "Third",
+        "position": "Left",
+        "visible": true
+      },
+      "created_at": "2025-08-06T19:38:53.609867"
+    },
+    {
+      "id": "chart_2_1754534586",
+      "chart_type": "pie_chart",
+      "x_column": "medium_value_orders",
+      "y_column": null,
+      "color_column": null,
+      "title": "Med Value Orders",
+      "table": "timpomaville.default.ecommerce_orders_gold",
+      "layout": {
+        "width": "Third",
+        "position": "Center",
+        "visible": true
+      },
+      "created_at": "2025-08-06T19:43:06.370447"
+    },
+    {
+      "id": "chart_3_1754534618",
+      "chart_type": "pie_chart",
+      "x_column": "high_value_orders",
+      "y_column": null,
+      "color_column": null,
+      "title": "High Value Orders",
+      "table": "timpomaville.default.ecommerce_orders_gold",
+      "layout": {
+        "width": "Third",
+        "position": "Right",
+        "visible": true
+      },
+      "created_at": "2025-08-06T19:43:38.509103"
+    },
+    {
+      "id": "chart_4_1754536207",
+      "chart_type": "scatter_plot",
+      "x_column": "total_quantity_sold",
+      "y_column": "avg_unit_price",
+      "color_column": null,
+      "title": "Avg Unit Price vs. Total Qty Sold",
+      "table": "timpomaville.default.ecommerce_orders_gold",
+      "layout": {
+        "width": "Full",
+        "position": "Auto",
+        "visible": true
+      },
+      "created_at": "2025-08-06T20:10:07.191920"
+    }
+  ],
+  "created_at": "2025-08-06 20:10:56.714454",
+  "tables": [
+    "timpomaville.default.ecommerce_orders_bronze",
+    "timpomaville.default.ecommerce_orders_silver",
+    "timpomaville.default.ecommerce_orders_gold"
+  ]
+}

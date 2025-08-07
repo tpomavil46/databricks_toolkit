@@ -212,7 +212,7 @@
     "gcp": {
       "project_id": "mydatabrickssandbox",
       "service_account_key": null,
-      "dataset": "analytics",
+      "dataset": "billing_export",
       "location": "US"
     },
     "aws": {

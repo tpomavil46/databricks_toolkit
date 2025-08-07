@@ -136,7 +136,7 @@ class DashboardConfig:
                 "gcp": {
                     "project_id": os.getenv("GCP_PROJECT_ID"),
                     "service_account_key": os.getenv("GCP_SERVICE_ACCOUNT_KEY"),
-                    "dataset": "analytics",
+                    "dataset": "billing_export",
                     "location": "US"
                 },
                 "aws": {
