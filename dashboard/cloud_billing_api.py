@@ -64,7 +64,7 @@ class CloudBillingAPI:
             print(
                 "❌ Cloud Billing API not available. Install with: pip install google-cloud-billing"
             )
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:  # pylint: disable=broad-except
             print(f"❌ Error initializing Cloud Billing API: {e}")
 
     def _get_billing_account(self):
@@ -85,7 +85,7 @@ class CloudBillingAPI:
 
             print("❌ No open billing account found")
 
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:  # pylint: disable=broad-except
             print(f"❌ Error getting billing account: {e}")
 
     def is_configured(self) -> bool:
@@ -126,7 +126,7 @@ class CloudBillingAPI:
                 print("⚠️ No current month costs found")
                 return {}
 
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:  # pylint: disable=broad-except
             print(f"❌ Error getting current month costs: {e}")
             return {}
 
@@ -172,18 +172,18 @@ class CloudBillingAPI:
 
                 return costs
 
-            except Exception as e:  # noqa: BLE001
+            except Exception as e:  # pylint: disable=broad-except
                 print(f"❌ Error querying billing account: {e}")
                 return {}
 
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:  # pylint: disable=broad-except
             print(f"❌ Error querying Cloud Billing API: {e}")
             return {}
 
     def _get_costs_from_billing_account(
         self,
         billing_account_name: str,
-        start_date: datetime,
+        start_date: datetime,  # noqa: ARG002
         end_date: datetime,  # noqa: ARG002
     ) -> Dict[str, float]:
         """
@@ -224,13 +224,13 @@ class CloudBillingAPI:
                     )
                     if service_costs > 0:
                         costs[service] = service_costs
-                except Exception as e:  # noqa: BLE001
+                except Exception as e:  # pylint: disable=broad-except
                     print(f"⚠️ Error getting costs for {service}: {e}")
                     continue
 
             return costs
 
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:  # pylint: disable=broad-except
             print(f"❌ Error getting costs from billing account: {e}")
             return {}
 
@@ -284,7 +284,7 @@ class CloudBillingAPI:
                 )
                 return []
 
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:  # pylint: disable=broad-except
             print(f"❌ Error getting services from Cloud Billing API: {e}")
             return []
 
@@ -339,13 +339,13 @@ class CloudBillingAPI:
                 )
                 return 0.0
 
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:  # pylint: disable=broad-except
             print(f"❌ Error getting costs for service {service_id}: {e}")
             return 0.0
 
     def get_service_costs(
-        self, service_name: str, days: int = 30
-    ) -> pd.DataFrame:  # noqa: ARG002
+        self, service_name: str, days: int = 30  # noqa: ARG002
+    ) -> pd.DataFrame:
         """
         Get costs for a specific service over a time period using Cloud Billing API.
 
@@ -383,7 +383,7 @@ class CloudBillingAPI:
                 print(f"❌ No data found for {service_name} via Cloud Billing API")
                 return pd.DataFrame()
 
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:  # pylint: disable=broad-except
             print(f"❌ Error getting {service_name} costs via Cloud Billing API: {e}")
             return pd.DataFrame()
 
@@ -483,14 +483,14 @@ class CloudBillingAPI:
                         )
                         return pd.DataFrame(data)
 
-                except Exception as e:  # noqa: BLE001
+                except Exception as e:  # pylint: disable=broad-except
                     print(f"⚠️ Error querying {service_name} from {table_name}: {e}")
                     continue
 
             print(f"⚠️ No data found for {service_name} in any billing export table")
             return pd.DataFrame()
 
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:  # pylint: disable=broad-except
             print(f"❌ Error getting {service_name} costs from BigQuery: {e}")
             return pd.DataFrame()
 
@@ -527,7 +527,7 @@ class CloudBillingAPI:
                 print("⚠️ No historical costs found via Cloud Billing API")
                 return {}
 
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:  # pylint: disable=broad-except
             print(f"❌ Error getting historical costs via Cloud Billing API: {e}")
             return {}
 
@@ -550,7 +550,7 @@ class CloudBillingAPI:
             print("⚠️ Detailed cost breakdown not yet implemented")
             return {}
 
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:  # pylint: disable=broad-except
             print(f"❌ Error getting cost breakdown: {e}")
             return {}
 
