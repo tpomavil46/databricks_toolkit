@@ -92,14 +92,15 @@ Monitor GCP costs directly from the command line:
 
 ```bash
 # Get current cost breakdown
-python shared/cli/monitoring/gcp_cost_cli.py --project-id mydatabrickssandbox
+make billing-costs YEAR=2025 MONTH=8
 
 # Get cost trends over time
-python shared/cli/monitoring/gcp_cost_cli.py --project-id mydatabrickssandbox --trends
+make billing-report YEAR=2025 MONTH=8
 
-# Export results as JSON
-python shared/cli/monitoring/gcp_cost_cli.py --project-id mydatabrickssandbox --output json
-```
+# Check cost threshold
+make billing-check THRESHOLD=100
+
+
 
 ### 🎯 **DLT and Auto Loader Support**
 
@@ -323,7 +324,6 @@ make lint
 
 - **[Getting Started](docs/getting_started.md)** - Complete getting started guide
 - **[User Guides](docs/user_guides/)** - Detailed guides for all features
-  - [Quick Start](docs/user_guides/quick_start.md) - 5-minute setup guide
   - [Dashboard Guide](docs/user_guides/dashboard_guide.md) - Dashboard documentation
   - [CLI Guide](docs/user_guides/cli_guide.md) - Command-line interface reference
   - [SQL Workflow Guide](docs/user_guides/sql_workflow_guide.md) - SQL-driven workflow
@@ -335,8 +335,7 @@ make lint
   - [DLT Coverage](docs/user_guides/dlt_coverage.md) - Delta Live Tables coverage
   - [Pipelines](docs/user_guides/pipelines.md) - Pipeline documentation
   - [Bootstrap Tools](docs/user_guides/bootstrap_tools.md) - Bootstrap utilities
-  - [CLI Commands](docs/user_guides/cli_commands.md) - CLI commands reference
-  - [Cloud Billing API](docs/user_guides/cloud_billing_api.md) - GCP billing API guide
+
 - **[Reference](docs/reference/)** - Configuration and troubleshooting
   - [Configuration](docs/reference/configuration.md) - Configuration reference
   - [Troubleshooting](docs/reference/troubleshooting.md) - Common issues and solutions

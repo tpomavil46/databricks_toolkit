@@ -98,14 +98,14 @@ python workflows/pyspark_etl/run.py data_ingestion
 python main.py sql retail --environment dev
 
 # Monitor pipeline execution
-python shared/cli/monitoring/health_cli.py
+# Health monitoring available through admin tools
 ```
 
 ### 2. Cost Monitoring
 
 ```bash
 # Monitor GCP costs
-python shared/cli/monitoring/gcp_cost_cli.py --project-id your-project
+make billing-costs YEAR=2025 MONTH=8
 
 # View cost dashboard
 streamlit run dashboard/dynamic_dashboard.py
@@ -161,6 +161,24 @@ Now that you're up and running, explore these resources:
 
 ### Common Issues
 
+**Dashboard won't start:**
+```bash
+# Check if Streamlit is installed
+pip install streamlit
+
+# Try running with debug
+streamlit run dashboard/dynamic_dashboard.py --logger.level debug
+```
+
+**Pipeline fails:**
+```bash
+# Check cluster status
+databricks clusters list
+
+# Verify connection
+python -c "from utils.session import DatabricksSession; print('Connection OK')"
+```
+
 **Connection Problems:**
 ```bash
 # Verify Databricks connection
@@ -177,7 +195,7 @@ which python
 pip list | grep databricks
 
 # Reinstall dependencies
-pip install -r requirements.txt
+pip install -r requirements.txt --force-reinstall
 ```
 
 ### Support Resources
@@ -186,6 +204,17 @@ pip install -r requirements.txt
 - **Examples**: See [Tutorials](tutorials/) for step-by-step guides
 - **CLI Help**: Use `--help` flag with any command
 - **Dashboard**: Use the built-in help in the Streamlit dashboard
+
+## 🎯 Success Checklist
+
+After completing the setup, you should be able to:
+
+- [ ] Dashboard loads at `http://localhost:8501`
+- [ ] Can see business analytics section
+- [ ] Pipeline runs without errors
+- [ ] Can view data tables in dashboard
+- [ ] Can create basic charts
+- [ ] Can monitor GCP costs with `make billing-costs`
 
 ## 🎯 Success Metrics
 

@@ -99,7 +99,7 @@ gcloud auth list
 
 ### Test 3: Billing Monitor
 ```bash
-python cli/billing_cli.py check --threshold 100
+make billing-check THRESHOLD=100
 ```
 
 ### Test 4: Full Pipeline
@@ -164,14 +164,12 @@ databricks configure --token
 ### Billing Monitoring
 ```bash
 # Check costs
-python cli/billing_cli.py costs --year 2025 --month 7
+make billing-costs YEAR=2025 MONTH=7
 
 # Check threshold
-python cli/billing_cli.py check --threshold 100
+make billing-check THRESHOLD=100
 
-# Get dashboard
-python cli/billing_cli.py dashboard
-```
+
 
 ### Pipeline Commands
 ```bash

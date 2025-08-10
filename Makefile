@@ -8,7 +8,7 @@ VENV_ACTIVATE=.venv/bin/activate
         deploy-transform run-transform-remote \
         deploy-pipeline run-pipeline-remote \
         generate-job clean-remote \
-        billing-costs billing-report billing-check billing-dashboard
+        billing-costs billing-report billing-check
 
 help:
 	@echo "Available targets:"
@@ -31,7 +31,6 @@ help:
 	@echo "  make billing-costs YEAR=2025 MONTH=8    Get monthly costs"
 	@echo "  make billing-report YEAR=2025 MONTH=8   Generate cost report"
 	@echo "  make billing-check THRESHOLD=100        Check cost threshold"
-	@echo "  make billing-dashboard                   Get dashboard data"
 
 test:
 	@echo "Running tests..."
@@ -159,12 +158,3 @@ monitor = BillingMonitor(); \
 cli = BillingCLI(monitor); \
 cli.run_cost_check($(THRESHOLD))"
 
-billing-dashboard:
-	@echo "📈 Getting dashboard data..."
-	. $(VENV_ACTIVATE) && python -c "\
-from utils.billing_monitor import BillingMonitor, BillingDashboard; \
-import json; \
-monitor = BillingMonitor(); \
-dashboard = BillingDashboard(monitor); \
-data = dashboard.get_dashboard_data(); \
-print(json.dumps(data, indent=2, default=str))"

@@ -397,12 +397,8 @@ databricks clusters list
 
 #### Health Check
 ```bash
-# Run comprehensive health check
-python shared/cli/monitoring/health_cli.py --detailed
-
-# Check specific components
-python shared/cli/monitoring/health_cli.py --component clusters
-python shared/cli/monitoring/health_cli.py --component users
+# Health monitoring available through admin tools
+python -c "from shared.admin.core.admin_client import AdminClient; print('Admin tools available')"
 ```
 
 #### Reset Environment

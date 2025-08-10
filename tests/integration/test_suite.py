@@ -64,7 +64,7 @@ class TestCLITools(BaseIntegrationTest):
 
     def test_dbfs_cli_basic_functionality(self):
         """Test basic DBFS CLI functionality."""
-        from cli.dbfs_cli import explore_dbfs_path
+        from shared.cli.dbfs_cli import explore_dbfs_path
 
         with patch("bootstrap.dbfs_explorer.explore_dbfs_path") as mock_explore:
             mock_explore.return_value = ["dbfs:/test/path1", "dbfs:/test/path2"]
@@ -77,7 +77,7 @@ class TestCLITools(BaseIntegrationTest):
 
     def test_analyze_dataset_basic_functionality(self):
         """Test basic dataset analysis functionality."""
-        from cli.analyze_dataset import analyze_dataset
+        from shared.cli.analyze_dataset import analyze_dataset
 
         with patch("databricks.connect.DatabricksSession") as mock_session:
             mock_spark = Mock()
@@ -105,7 +105,7 @@ class TestCLITools(BaseIntegrationTest):
 
     def test_bronze_ingestion_basic_functionality(self):
         """Test basic bronze ingestion functionality."""
-        from cli.bronze_ingestion import bronze_ingestion
+        from shared.cli.bronze_ingestion import bronze_ingestion
 
         with patch("databricks.connect.DatabricksSession") as mock_session:
             mock_spark = Mock()
@@ -133,7 +133,7 @@ class TestCLITools(BaseIntegrationTest):
 
     def test_drop_table_basic_functionality(self):
         """Test basic drop table functionality."""
-        from cli.drop_table import drop_table
+        from shared.cli.drop_table import drop_table
 
         with patch("databricks.connect.DatabricksSession") as mock_session:
             mock_spark = Mock()
@@ -157,7 +157,7 @@ class TestAdminTools(BaseIntegrationTest):
 
     def test_admin_client_initialization(self):
         """Test AdminClient initialization."""
-        from admin.core.admin_client import AdminClient
+        from shared.admin.core.admin_client import AdminClient
 
         with patch("databricks.sdk.WorkspaceClient") as mock_workspace_client:
             mock_workspace_client.return_value = self.mock_client

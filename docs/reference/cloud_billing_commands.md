@@ -61,17 +61,15 @@ curl -X PUT "https://cloudbilling.googleapis.com/v1/projects/mydatabrickssandbox
 ### 6. CLI Commands (WORKING)
 ```bash
 # Get monthly costs
-python cli/billing_cli.py costs --year 2025 --month 7
+make billing-costs YEAR=2025 MONTH=7
 
 # Check cost threshold
-python cli/billing_cli.py check --threshold 100
+make billing-check THRESHOLD=100
 
 # Generate comprehensive report
-python cli/billing_cli.py report --year 2025 --month 7
+make billing-report YEAR=2025 MONTH=7
 
-# Get dashboard data
-python cli/billing_cli.py dashboard
-```
+
 
 ### 7. Make Commands (WORKING)
 ```bash
@@ -84,9 +82,7 @@ make billing-check THRESHOLD=100
 # Generate report
 make billing-report YEAR=2025 MONTH=7
 
-# Get dashboard
-make billing-dashboard
-```
+
 
 ### 8. Python Integration (WORKING)
 ```python

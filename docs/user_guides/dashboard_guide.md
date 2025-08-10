@@ -280,7 +280,7 @@ gcloud auth list
 gcloud services enable billing.googleapis.com
 
 # Test cost CLI
-python shared/cli/monitoring/gcp_cost_cli.py --project-id your-project
+make billing-costs YEAR=2025 MONTH=8
 ```
 
 ### Performance Optimization

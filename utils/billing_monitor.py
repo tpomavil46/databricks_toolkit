@@ -365,39 +365,4 @@ class BillingCLI:
             print("✅ Costs within threshold")
 
 
-class BillingDashboard:
-    """Dashboard integration for billing data."""
 
-    def __init__(self, monitor: BillingMonitor):
-        self.monitor = monitor
-
-    def get_dashboard_data(self) -> Dict[str, Any]:
-        """Get data for dashboard display."""
-        now = datetime.now()
-
-        # Current month data
-        current_month = self.monitor.get_monthly_costs(now.year, now.month)
-
-        # Last 7 days
-        end_date = now.strftime("%Y-%m-%d")
-        start_date = (now - timedelta(days=7)).strftime("%Y-%m-%d")
-        last_7_days = self.monitor.get_daily_costs(start_date, end_date)
-
-        # Cost threshold check
-        threshold_status = self.monitor.check_cost_threshold()
-
-        return {
-            "current_month": current_month.to_dict("records"),
-            "last_7_days": last_7_days.to_dict("records"),
-            "threshold_status": threshold_status,
-            "summary": {
-                "total_monthly_cost": current_month["Monthly_Cost"].sum(),
-                "databricks_cost": sum(
-                    row["Daily_Cost"]
-                    for row in last_7_days.to_dict("records")
-                    if row["Service"] in ["Compute Engine", "Cloud Storage"]
-                ),
-                "days_with_costs": len(last_7_days["Day"].unique()),
-                "alert_status": threshold_status["alert"],
-            },
-        }
