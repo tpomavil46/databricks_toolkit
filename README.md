@@ -76,14 +76,14 @@ python run_dashboard.py
 ```
 
 **Dashboard Features:**
-- **☁️ GCP Dashboard**: Real-time GCP cost monitoring with BigQuery, Cloud Storage, and Dataproc analytics
+- **📊 Business Analytics**: Data exploration, visualization, and pipeline monitoring
 - **📊 Business Analytics**: Table discovery, chart building, and pipeline visualization
 - **🏗️ Pipeline Builder**: Build and visualize data pipelines with Bronze → Silver → Gold architecture
 - **💾 Dashboard Management**: Save and load custom dashboard configurations
 
 **Access the Dashboard:**
 - **URL**: http://localhost:8501
-- **GCP Mode**: Click "☁️ GCP Dashboard" in the sidebar
+- **Business Mode**: Click "📊 Business Analytics" in the sidebar
 - **Business Mode**: Click "📊 Business Analytics" in the sidebar
 
 ### 🎯 **GCP Cost Monitoring CLI**
@@ -241,12 +241,14 @@ python main.py sql retail
 
 **Run with custom environment**:
 ```bash
-python main.py sql ecommerce --environment prod
+python main.py sql ecommerce --environment dev
 ```
 
 **Direct workflow access**:
 ```bash
-python workflows/sql_driven/run.py retail --environment staging
+python workflows/sql_driven/run.py retail --environment dev
+
+> **Note:** Currently only `dev` environment is supported. `staging` and `prod` environments require additional Databricks workspace configuration.
 ```
 
 ### PySpark ETL Workflow
@@ -258,7 +260,7 @@ python main.py pyspark data_ingestion
 
 **Run with custom environment**:
 ```bash
-python main.py pyspark transformation --environment prod
+python main.py pyspark transformation --environment dev
 ```
 
 **Direct workflow access**:
@@ -319,11 +321,28 @@ make lint
 
 ## 📚 Documentation
 
-- **[SQL-Driven Workflow](workflows/sql_driven/README.md)** - Complete SQL workflow guide
-- **[PySpark ETL Workflow](workflows/pyspark_etl/README.md)** - Complete PySpark ETL guide
-- **[CI Setup Guide](CI_SETUP.md)** - CI/CD configuration and testing
-- **Commands Reference** - See the Commands Reference section above
-- **[Roadmap](ROADMAP.md)** - Project roadmap and future enhancements
+- **[Getting Started](docs/getting_started.md)** - Complete getting started guide
+- **[User Guides](docs/user_guides/)** - Detailed guides for all features
+  - [Quick Start](docs/user_guides/quick_start.md) - 5-minute setup guide
+  - [Dashboard Guide](docs/user_guides/dashboard_guide.md) - Dashboard documentation
+  - [CLI Guide](docs/user_guides/cli_guide.md) - Command-line interface reference
+  - [SQL Workflow Guide](docs/user_guides/sql_workflow_guide.md) - SQL-driven workflow
+  - [PySpark Workflow Guide](docs/user_guides/pyspark_workflow_guide.md) - PySpark ETL workflow
+  - [SQL Library Guide](docs/user_guides/sql_library_guide.md) - SQL library reference
+  - [Admin Tools Guide](docs/user_guides/admin_tools_guide.md) - Administrative tools
+  - [Windows Setup](docs/user_guides/windows_setup.md) - Windows-specific setup guide
+  - [Bronze Ingestion](docs/user_guides/bronze_ingestion.md) - Bronze layer ingestion guide
+  - [DLT Coverage](docs/user_guides/dlt_coverage.md) - Delta Live Tables coverage
+  - [Pipelines](docs/user_guides/pipelines.md) - Pipeline documentation
+  - [Bootstrap Tools](docs/user_guides/bootstrap_tools.md) - Bootstrap utilities
+  - [CLI Commands](docs/user_guides/cli_commands.md) - CLI commands reference
+  - [Cloud Billing API](docs/user_guides/cloud_billing_api.md) - GCP billing API guide
+- **[Reference](docs/reference/)** - Configuration and troubleshooting
+  - [Configuration](docs/reference/configuration.md) - Configuration reference
+  - [Troubleshooting](docs/reference/troubleshooting.md) - Common issues and solutions
+  - [CI Setup](docs/reference/ci_setup.md) - CI/CD configuration and testing
+  - [Roadmap](docs/reference/roadmap.md) - Project roadmap and future enhancements
+  - [Cloud Billing Commands](docs/reference/cloud_billing_commands.md) - GCP billing commands reference
 
 ## 🔧 Configuration
 

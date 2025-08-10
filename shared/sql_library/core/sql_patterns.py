@@ -13,7 +13,32 @@ import json
 
 @dataclass
 class SQLPattern:
-    """Represents a SQL pattern with metadata."""
+    """Represents a SQL pattern with metadata and examples.
+    
+    A SQL pattern is a reusable template that can be parameterized and rendered
+    into executable SQL code. Each pattern includes metadata for categorization,
+    search, and documentation purposes.
+    
+    Attributes:
+        name: Human-readable name for the pattern.
+        description: Detailed description of what the pattern does.
+        sql_template: SQL template string with parameter placeholders.
+        parameters: List of required parameter names for the template.
+        category: Category classification (e.g., 'ingestion', 'transformation').
+        tags: List of tags for searching and categorization.
+        examples: List of example usage dictionaries.
+        
+    Example:
+        >>> pattern = SQLPattern(
+        ...     name="Bronze Ingestion",
+        ...     description="Standard pattern for ingesting raw data",
+        ...     sql_template="CREATE TABLE {table_name} AS SELECT * FROM {source}",
+        ...     parameters=["table_name", "source"],
+        ...     category="ingestion",
+        ...     tags=["bronze", "raw", "ingestion"],
+        ...     examples=[{"description": "Example usage", "parameters": {...}}]
+        ... )
+    """
 
     name: str
     description: str
@@ -26,18 +51,55 @@ class SQLPattern:
 
 class SQLPatterns:
     """
-    Standardized SQL patterns for common operations.
-
-    This class provides reusable SQL patterns that leverage
-    Databricks' built-in functionality and follow best practices.
+    SQL Patterns Library for Databricks.
+    
+    This class provides reusable SQL patterns that leverage Databricks' built-in 
+    functionality and follow best practices for data engineering workflows.
+    
+    The library includes patterns for:
+    - Data ingestion (bronze layer)
+    - Data transformation (silver layer) 
+    - Data aggregation (gold layer)
+    - Data quality validation
+    - Business rule validation
+    
+    Attributes:
+        patterns: Dictionary mapping pattern names to SQLPattern objects.
+        
+    Example:
+        >>> patterns = SQLPatterns()
+        >>> sql = patterns.render_pattern('bronze_ingestion', {
+        ...     'catalog': 'hive_metastore',
+        ...     'schema': 'retail',
+        ...     'table_name': 'customers',
+        ...     'source_table': 'csv.`/mnt/databricks-datasets/retail-org/customers/`'
+        ... })
+        >>> print(sql)
     """
 
     def __init__(self):
-        """Initialize SQL patterns."""
+        """Initialize SQL patterns library.
+        
+        Loads all available SQL patterns into memory for quick access.
+        Patterns are organized by category: ingestion, transformation, 
+        quality, aggregation, and validation.
+        """
         self.patterns = self._load_patterns()
 
     def _load_patterns(self) -> Dict[str, SQLPattern]:
-        """Load all SQL patterns."""
+        """Load all SQL patterns from all categories.
+        
+        This method initializes the complete pattern library by loading patterns
+        from all categories: ingestion, transformation, quality, aggregation,
+        and validation.
+        
+        Returns:
+            Dictionary mapping pattern names to SQLPattern objects.
+            
+        Note:
+            This is an internal method called during initialization.
+            Patterns are loaded once and cached for performance.
+        """
         patterns = {}
 
         # Data Ingestion Patterns
@@ -58,7 +120,16 @@ class SQLPatterns:
         return patterns
 
     def _get_ingestion_patterns(self) -> Dict[str, SQLPattern]:
-        """Get data ingestion patterns."""
+        """Get data ingestion patterns for bronze layer processing.
+        
+        Returns:
+            Dictionary of ingestion patterns including:
+            - bronze_ingestion: Standard bronze layer ingestion
+            - incremental_ingestion: Incremental ingestion with deduplication
+            
+        Note:
+            This is an internal method used during pattern library initialization.
+        """
         return {
             "bronze_ingestion": SQLPattern(
                 name="Bronze Ingestion",
@@ -438,17 +509,65 @@ WHERE p.{primary_key} IS NULL
         }
 
     def get_pattern(self, pattern_name: str) -> Optional[SQLPattern]:
-        """Get a specific SQL pattern by name."""
+        """Get a specific SQL pattern by name.
+        
+        Args:
+            pattern_name: Name of the pattern to retrieve.
+            
+        Returns:
+            SQLPattern object if found, None otherwise.
+            
+        Example:
+            >>> patterns = SQLPatterns()
+            >>> pattern = patterns.get_pattern('bronze_ingestion')
+            >>> print(pattern.name)
+            'Bronze Ingestion'
+        """
         return self.patterns.get(pattern_name)
 
     def list_patterns(self, category: Optional[str] = None) -> List[SQLPattern]:
-        """List all patterns, optionally filtered by category."""
+        """List all patterns, optionally filtered by category.
+        
+        Args:
+            category: Optional category filter (e.g., 'ingestion', 'transformation').
+                     If None, returns all patterns.
+                     
+        Returns:
+            List of SQLPattern objects matching the criteria.
+            
+        Example:
+            >>> patterns = SQLPatterns()
+            >>> ingestion_patterns = patterns.list_patterns('ingestion')
+            >>> all_patterns = patterns.list_patterns()
+        """
         if category:
             return [p for p in self.patterns.values() if p.category == category]
         return list(self.patterns.values())
 
     def render_pattern(self, pattern_name: str, parameters: Dict[str, Any]) -> str:
-        """Render a SQL pattern with the given parameters."""
+        """Render a SQL pattern with the given parameters.
+        
+        Args:
+            pattern_name: Name of the pattern to render.
+            parameters: Dictionary of parameters to substitute in the SQL template.
+                       Must include all required parameters for the pattern.
+                       
+        Returns:
+            Rendered SQL string with parameters substituted.
+            
+        Raises:
+            ValueError: If pattern_name is not found or required parameters are missing.
+            
+        Example:
+            >>> patterns = SQLPatterns()
+            >>> sql = patterns.render_pattern('bronze_ingestion', {
+            ...     'catalog': 'hive_metastore',
+            ...     'schema': 'retail',
+            ...     'table_name': 'customers',
+            ...     'source_table': 'csv.`/mnt/databricks-datasets/retail-org/customers/`'
+            ... })
+            >>> print(sql)
+        """
         pattern = self.get_pattern(pattern_name)
         if not pattern:
             raise ValueError(f"Pattern '{pattern_name}' not found")
@@ -462,12 +581,38 @@ WHERE p.{primary_key} IS NULL
         return pattern.sql_template.format(**parameters)
 
     def get_pattern_examples(self, pattern_name: str) -> List[Dict[str, Any]]:
-        """Get examples for a specific pattern."""
+        """Get examples for a specific pattern.
+        
+        Args:
+            pattern_name: Name of the pattern to get examples for.
+            
+        Returns:
+            List of example dictionaries, each containing 'description' and 'parameters'.
+            
+        Example:
+            >>> patterns = SQLPatterns()
+            >>> examples = patterns.get_pattern_examples('bronze_ingestion')
+            >>> for example in examples:
+            ...     print(example['description'])
+        """
         pattern = self.get_pattern(pattern_name)
         return pattern.examples if pattern else []
 
     def search_patterns(self, query: str) -> List[SQLPattern]:
-        """Search patterns by name, description, or tags."""
+        """Search patterns by name, description, or tags.
+        
+        Args:
+            query: Search query string. Case-insensitive search in pattern names,
+                   descriptions, and tags.
+                   
+        Returns:
+            List of SQLPattern objects that match the search query.
+            
+        Example:
+            >>> patterns = SQLPatterns()
+            >>> bronze_patterns = patterns.search_patterns('bronze')
+            >>> quality_patterns = patterns.search_patterns('quality')
+        """
         query_lower = query.lower()
         results = []
 

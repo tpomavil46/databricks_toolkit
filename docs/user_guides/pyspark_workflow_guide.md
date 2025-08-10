@@ -1,14 +1,15 @@
-# PySpark ETL Workflow
+# PySpark ETL Workflow Guide
 
-## Overview
+Complete guide to the PySpark ETL workflow for Databricks data engineering.
+
+## 🎯 Overview
 
 The PySpark ETL Workflow is designed for teams that prefer Python-first data processing. It provides a comprehensive ETL framework with standardized patterns, data validation, and pipeline orchestration using PySpark.
 
-## Architecture
+## 🏗️ Architecture
 
 ```
 workflows/pyspark_etl/
-├── README.md              # This documentation
 ├── run.py                 # Main entry point
 ├── pipelines/             # PySpark ETL pipeline implementations
 │   └── pipeline.py
@@ -20,7 +21,7 @@ workflows/pyspark_etl/
 └── examples/             # Example implementations
 ```
 
-## Key Features
+## ✨ Key Features
 
 ### ✅ Python-First Approach
 - PySpark DataFrames for data processing
@@ -42,7 +43,7 @@ workflows/pyspark_etl/
 - Validation at each pipeline stage
 - Comprehensive error reporting
 
-## Quick Start
+## 🚀 Quick Start
 
 ### 1. Run a PySpark ETL Pipeline
 
@@ -64,7 +65,7 @@ python workflows/pyspark_etl/run.py data_ingestion
 python workflows/pyspark_etl/run.py transformation --environment staging
 ```
 
-## Project Structure
+## 📁 Project Structure
 
 ### Pipeline Organization
 
@@ -118,7 +119,7 @@ Environment-specific configurations:
 }
 ```
 
-## Usage Examples
+## 💻 Usage Examples
 
 ### Basic Pipeline Execution
 
@@ -170,7 +171,7 @@ validation_results = validator.validate_dataframe(
 )
 ```
 
-## Configuration
+## ⚙️ Configuration
 
 ### Environment Variables
 
@@ -196,7 +197,7 @@ PIPELINE_CONFIG = {
 }
 ```
 
-## Best Practices
+## 📚 Best Practices
 
 ### 1. Data Processing
 - Use lazy evaluation for performance
@@ -218,7 +219,7 @@ PIPELINE_CONFIG = {
 - Implement data quality checks
 - Monitor data lineage
 
-## Troubleshooting
+## 🔧 Troubleshooting
 
 ### Common Issues
 
@@ -252,7 +253,7 @@ logging.basicConfig(level=logging.DEBUG)
 spark.sparkContext.setLogLevel("DEBUG")
 ```
 
-## Integration with Shared Components
+## 🔗 Integration with Shared Components
 
 ### CLI Tools
 ```bash
@@ -275,7 +276,7 @@ from shared.sql_library.core.sql_patterns import SQLPatterns
 from shared.sql_library.core.data_quality import DataQualityChecks
 ```
 
-## Advanced Features
+## 🚀 Advanced Features
 
 ### Custom Transformations
 
@@ -309,7 +310,7 @@ pipeline = Pipeline(
 pipeline.run()
 ```
 
-## Migration from Old Structure
+## 🔄 Migration from Old Structure
 
 If migrating from the old structure:
 
@@ -318,7 +319,7 @@ If migrating from the old structure:
 3. **Test pipelines** with new structure
 4. **Update documentation** to reflect changes
 
-## Next Steps
+## 🎯 Next Steps
 
 1. **Add more transformation patterns** for common use cases
 2. **Implement advanced data quality checks** with ML-based validation
@@ -327,4 +328,4 @@ If migrating from the old structure:
 
 ---
 
-**For more information, see the main project README.md** 
+**For more information, see the [Getting Started](getting_started.md) guide or [CLI Guide](cli_guide.md).**

@@ -58,3 +58,6 @@ htmlcov/
 # Local job specs or dev runs
 jobs/*.json
 local_runner.py
+
+# Exam study materials (personal study files)
+exam_study/

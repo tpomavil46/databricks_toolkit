@@ -1,14 +1,15 @@
-# SQL-Driven Workflow
+# SQL-Driven Workflow Guide
 
-## Overview
+Complete guide to the SQL-driven workflow for Databricks data engineering.
+
+## 🎯 Overview
 
 The SQL-Driven Workflow is designed for teams that prefer SQL-first data processing. It provides a clean, parameterized approach to data pipelines where SQL is the primary language for transformations.
 
-## Architecture
+## 🏗️ Architecture
 
 ```
 workflows/sql_driven/
-├── README.md              # This documentation
 ├── run.py                 # Main entry point
 ├── pipelines/             # SQL-driven pipeline implementations
 │   └── sql_driven_pipeline.py
@@ -21,7 +22,7 @@ workflows/sql_driven/
 └── examples/             # Example implementations
 ```
 
-## Key Features
+## ✨ Key Features
 
 ### ✅ SQL-First Approach
 - SQL is the primary transformation language
@@ -43,7 +44,7 @@ workflows/sql_driven/
 - Clear separation between domains
 - Easy to maintain and extend
 
-## Quick Start
+## 🚀 Quick Start
 
 ### 1. Run a SQL Pipeline
 
@@ -65,7 +66,7 @@ python workflows/sql_driven/run.py retail
 python workflows/sql_driven/run.py retail --environment staging
 ```
 
-## Project Structure
+## 📁 Project Structure
 
 ### SQL Organization
 
@@ -116,7 +117,7 @@ Environment-specific configurations:
 }
 ```
 
-## Usage Examples
+## 💻 Usage Examples
 
 ### Basic Pipeline Execution
 
@@ -147,7 +148,7 @@ pipeline.execute_sql_with_params(
 )
 ```
 
-## Configuration
+## ⚙️ Configuration
 
 ### Environment Variables
 
@@ -173,7 +174,7 @@ PIPELINE_CONFIG = {
 }
 ```
 
-## Best Practices
+## 📚 Best Practices
 
 ### 1. SQL Organization
 - Use descriptive file names
@@ -195,7 +196,7 @@ PIPELINE_CONFIG = {
 - Optimize SQL queries
 - Monitor execution times
 
-## Troubleshooting
+## 🔧 Troubleshooting
 
 ### Common Issues
 
@@ -226,7 +227,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 ```
 
-## Integration with Shared Components
+## 🔗 Integration with Shared Components
 
 ### CLI Tools
 ```bash
@@ -249,7 +250,7 @@ from shared.sql_library.core.sql_patterns import SQLPatterns
 from shared.sql_library.core.data_quality import DataQualityChecks
 ```
 
-## Migration from Old Structure
+## 🔄 Migration from Old Structure
 
 If migrating from the old structure:
 
@@ -258,7 +259,7 @@ If migrating from the old structure:
 3. **Test pipelines** with new structure
 4. **Update documentation** to reflect changes
 
-## Next Steps
+## 🎯 Next Steps
 
 1. **Add more SQL templates** for common patterns
 2. **Implement data quality checks** in SQL
@@ -267,4 +268,4 @@ If migrating from the old structure:
 
 ---
 
-**For more information, see the main project README.md** 
+**For more information, see the [Getting Started](getting_started.md) guide or [CLI Guide](cli_guide.md).**

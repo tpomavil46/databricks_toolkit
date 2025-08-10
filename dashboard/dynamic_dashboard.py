@@ -15,7 +15,7 @@ import time
 from calendar import monthrange
 
 # Import our existing modules
-from cloud_integrations import DatabricksIntegration, GoogleCloudIntegration
+from cloud_integrations import DatabricksIntegration
 from config import DashboardConfig
 
 
@@ -25,14 +25,17 @@ class DynamicDashboard:
     def __init__(self):
         self.config = DashboardConfig()
         self.databricks = DatabricksIntegration()
-        self.gcp = GoogleCloudIntegration()
 
     def discover_tables(self) -> List[Dict[str, Any]]:
         """Discover available tables in Databricks workspace"""
         try:
-            from databricks.connect import DatabricksSession
+            # Show cluster startup message
+            with st.spinner(
+                "🔄 Starting Databricks cluster... This may take 3-5 minutes on first run"
+            ):
+                from databricks.connect import DatabricksSession
 
-            spark = DatabricksSession.builder.remote().getOrCreate()
+                spark = DatabricksSession.builder.remote().getOrCreate()
 
             tables_info = []
 
@@ -1708,396 +1711,6 @@ class DynamicDashboard:
                         with col3:
                             st.metric("Datetime", len(analysis["datetime_columns"]))
 
-    def render_gcp_dashboard(self):
-        """Render the GCP Cost Dashboard"""
-        st.header("☁️ GCP Cost Dashboard")
-        st.markdown("---")
-
-        # Add comprehensive time period summary
-        from datetime import datetime
-
-        current_date = datetime.now()
-        current_month = current_date.strftime("%B %Y")
-
-        st.success(f"📅 **Dashboard Time Period**: {current_month}")
-        st.info(
-            """
-        **Data Sources**:
-        - **Real-Time Costs**: Current month (August 2025) - if available
-        - **Detailed Billing**: Historical data (June-July 2025) from billing export
-        - **Service Details**: Current month data - if available
-        """
-        )
-
-        # Check if GCP is configured
-        if not self.gcp.is_configured():
-            st.error("❌ GCP is not configured. Please set up authentication.")
-            st.info(
-                "💡 Set up GCP authentication with: `gcloud auth application-default login`"
-            )
-            return
-
-        # GCP Configuration Status
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.metric("Project ID", self.gcp.project_id or "Not Set")
-        with col2:
-            st.metric("Dataset", self.gcp.dataset or "Not Set")
-        with col3:
-            status = (
-                "✅ Configured" if self.gcp.is_configured() else "❌ Not Configured"
-            )
-            st.metric("Status", status)
-
-        # Real-Time Cost Monitoring
-        st.subheader("💰 Real-Time Cost Monitoring")
-
-        # Add time period indicator
-        from datetime import datetime
-
-        current_date = datetime.now()
-        current_month = current_date.strftime("%B %Y")
-
-        st.info(f"📅 **Data Period**: {current_month} (Current Month)")
-
-        # Get both detailed billing costs and real-time costs
-        detailed_costs = self.gcp.get_detailed_billing_costs()
-        real_time_costs = self.gcp.get_real_time_billing_costs()
-
-        # Also get Cloud Billing API data
-        try:
-            from cloud_billing_api import CloudBillingAPI
-
-            cloud_billing_api = CloudBillingAPI()
-            cloud_billing_costs = cloud_billing_api.get_historical_costs(days=30)
-        except Exception as e:
-            print(f"⚠️ Cloud Billing API not available: {e}")
-            cloud_billing_costs = {}
-
-        # Show real-time costs if available
-        if real_time_costs:
-            total_real_time = sum(real_time_costs.values())
-
-            st.success("✅ **Real-Time Google Cloud Costs** (from Billing API)")
-
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric("Current Month Total", f"${total_real_time:.2f}")
-            with col2:
-                # Calculate daily average
-                current_date = datetime.now()
-                days_in_month = current_date.day
-                daily_avg = total_real_time / days_in_month if days_in_month > 0 else 0
-                st.metric("Daily Average", f"${daily_avg:.2f}")
-            with col3:
-                # Estimate monthly projection
-                _, days_in_month = monthrange(current_date.year, current_date.month)
-                monthly_projection = (
-                    total_real_time * (days_in_month / current_date.day)
-                    if current_date.day > 0
-                    else 0
-                )
-                st.metric("Monthly Projection", f"${monthly_projection:.2f}")
-
-            # Real-time cost breakdown
-            st.subheader("📊 Real-Time Cost Breakdown")
-
-            if real_time_costs:
-                import pandas as pd
-
-                cost_data = []
-                for service, cost in real_time_costs.items():
-                    if cost > 0:  # Only show services with actual costs
-                        cost_data.append(
-                            {
-                                "Service": service.replace("_", " ").title(),
-                                "Cost": cost,
-                                "Percentage": (
-                                    (cost / total_real_time * 100)
-                                    if total_real_time > 0
-                                    else 0
-                                ),
-                            }
-                        )
-
-                if cost_data:
-                    cost_df = pd.DataFrame(cost_data)
-                    cost_df = cost_df.sort_values("Cost", ascending=False)
-
-                    # Display as a table
-                    st.dataframe(cost_df, use_container_width=True)
-
-                    # Create pie chart
-                    if len(cost_df) > 0:
-                        fig = px.pie(
-                            cost_df,
-                            values="Cost",
-                            names="Service",
-                            title="Real-Time Cost Distribution",
-                        )
-                        st.plotly_chart(fig, use_container_width=True)
-                else:
-                    st.info("No costs recorded for current month")
-
-        # Show Cloud Billing API data if available
-        if cloud_billing_costs:
-            st.subheader("☁️ Cloud Billing API Data")
-
-            # Add time period indicator for Cloud Billing API
-            st.success("📊 **Cloud Billing API** (Real-time Historical Data)")
-
-            # Calculate totals
-            total_cloud_billing_cost = sum(cloud_billing_costs.values())
-
-            col1, col2 = st.columns(2)
-            with col1:
-                st.metric("Total Cost (30 days)", f"${total_cloud_billing_cost:.2f}")
-            with col2:
-                st.metric("Daily Average", f"${total_cloud_billing_cost/30:.2f}")
-
-            # Cloud Billing API cost breakdown
-            st.subheader("📊 Cloud Billing API Cost Breakdown")
-
-            import pandas as pd
-
-            cloud_billing_data = []
-            for service, cost in cloud_billing_costs.items():
-                if cost > 0:  # Only show services with costs
-                    cloud_billing_data.append(
-                        {
-                            "Service": service.replace("_", " ").title(),
-                            "Cost": cost,
-                            "Percentage": (
-                                (cost / total_cloud_billing_cost * 100)
-                                if total_cloud_billing_cost > 0
-                                else 0
-                            ),
-                        }
-                    )
-
-            if cloud_billing_data:
-                cloud_billing_df = pd.DataFrame(cloud_billing_data)
-                cloud_billing_df = cloud_billing_df.sort_values("Cost", ascending=False)
-
-                # Display as a table
-                st.dataframe(cloud_billing_df, use_container_width=True)
-
-                # Create pie chart
-                if len(cloud_billing_df) > 0:
-                    fig = px.pie(
-                        cloud_billing_df,
-                        values="Cost",
-                        names="Service",
-                        title="Cloud Billing API Cost Distribution",
-                    )
-                    st.plotly_chart(fig, use_container_width=True)
-
-        # Show detailed billing data if available
-        if detailed_costs:
-            st.subheader("📋 Detailed Billing Data")
-
-            # Add time period indicator for detailed billing
-            st.info("📊 **Detailed Billing Export** (Historical Data - June-July 2025)")
-
-            # Calculate totals
-            total_usage_cost = sum(
-                cost["usage_cost"] for cost in detailed_costs.values()
-            )
-            total_savings_programs = sum(
-                cost["savings_programs"] for cost in detailed_costs.values()
-            )
-            total_other_savings = sum(
-                cost["other_savings"] for cost in detailed_costs.values()
-            )
-            total_subtotal = sum(cost["subtotal"] for cost in detailed_costs.values())
-
-            col1, col2, col3, col4 = st.columns(4)
-            with col1:
-                st.metric("Total Usage Cost", f"${total_usage_cost:.2f}")
-            with col2:
-                st.metric("Savings Programs", f"${total_savings_programs:.2f}")
-            with col3:
-                st.metric("Other Savings", f"${total_other_savings:.2f}")
-            with col4:
-                st.metric("Total Subtotal", f"${total_subtotal:.2f}")
-
-            # Detailed cost breakdown table
-            st.subheader("📊 Detailed Cost Breakdown")
-
-            import pandas as pd
-
-            cost_data = []
-            for service, costs in detailed_costs.items():
-                cost_data.append(
-                    {
-                        "Service": service.replace("_", " ").title(),
-                        "Usage Cost": costs["usage_cost"],
-                        "Savings Programs": costs["savings_programs"],
-                        "Other Savings": costs["other_savings"],
-                        "Subtotal": costs["subtotal"],
-                    }
-                )
-
-            if cost_data:
-                cost_df = pd.DataFrame(cost_data)
-                cost_df = cost_df.sort_values("Subtotal", ascending=False)
-
-                # Display as a table
-                st.dataframe(cost_df, use_container_width=True)
-
-        # Show alerts based on available data
-        st.subheader("🚨 Real-Time Alerts")
-
-        alerts = []
-
-        if real_time_costs:
-            total_real_time = sum(real_time_costs.values())
-            if total_real_time > 100:
-                alerts.append("⚠️ **High Cost Alert**: Current month costs exceed $100")
-            elif total_real_time > 50:
-                alerts.append("⚠️ **Medium Cost Alert**: Current month costs exceed $50")
-            elif total_real_time > 10:
-                alerts.append("⚠️ **Low Cost Alert**: Current month costs exceed $10")
-            elif total_real_time > 0:
-                alerts.append("✅ **Costs Under Control**: Current month costs are low")
-            else:
-                alerts.append("✅ **No Costs**: No charges for current month")
-
-        if detailed_costs:
-            total_subtotal = sum(cost["subtotal"] for cost in detailed_costs.values())
-            total_savings_programs = sum(
-                cost["savings_programs"] for cost in detailed_costs.values()
-            )
-            total_other_savings = sum(
-                cost["other_savings"] for cost in detailed_costs.values()
-            )
-
-            if total_savings_programs > 0:
-                alerts.append(
-                    f"💰 **Savings Active**: ${total_savings_programs:.2f} in savings programs"
-                )
-
-            if total_other_savings > 0:
-                alerts.append(
-                    f"💳 **Credits Applied**: ${total_other_savings:.2f} in other savings"
-                )
-
-        if not alerts:
-            alerts.append("✅ **No Alerts**: All costs are within normal ranges")
-
-        for alert in alerts:
-            st.info(alert)
-
-        if not real_time_costs and not detailed_costs:
-            st.error("❌ **No Cost Data Available**")
-            st.info("💡 **To get real-time costs:**")
-            st.markdown(
-                """
-            1. **Enable Billing Export** in Google Cloud Console
-            2. **Wait for current month data** to populate
-            3. **Refresh the dashboard** to see real costs
-            """
-            )
-
-        # Get all services data for detailed view
-        all_services = self.gcp.get_all_services_usage()
-
-        # Service-specific details
-        st.subheader("📊 Service Details")
-
-        # Add time period indicator for service details
-        st.info(f"📅 **Service Data Period**: {current_month} (Current Month)")
-
-        # Filter out services with no data
-        available_services = {
-            name: df for name, df in all_services.items() if not df.empty
-        }
-
-        if available_services:
-            # Create tabs for each service with data
-            service_tabs = st.tabs(
-                [
-                    service.replace("_", " ").title()
-                    for service in available_services.keys()
-                ]
-            )
-
-            for i, (service_name, df) in enumerate(available_services.items()):
-                with service_tabs[i]:
-                    if not df.empty:
-                        # Add time period indicator for this service
-                        st.info(
-                            f"📅 **{service_name.replace('_', ' ').title()} Data Period**: {current_month}"
-                        )
-
-                        # Service metrics
-                        total_cost = df["cost"].sum()
-                        avg_daily_cost = df["cost"].mean()
-
-                        # Check if this service has detailed billing data
-                        detailed_cost = detailed_costs.get(service_name, {})
-                        has_detailed_data = service_name in detailed_costs
-
-                        col1, col2, col3, col4 = st.columns(4)
-                        with col1:
-                            st.metric("Total Cost", f"${total_cost:.2f}")
-                        with col2:
-                            st.metric(f"Avg Daily Cost", f"${avg_daily_cost:.2f}")
-                        with col3:
-                            if has_detailed_data:
-                                subtotal = detailed_cost.get("subtotal", 0)
-                                st.metric("Detailed Subtotal", f"${subtotal:.2f}")
-                            else:
-                                st.metric("Detailed Data", "Not Available")
-                        with col4:
-                            # Show relevant metric based on service
-                            if service_name == "bigquery":
-                                st.metric("Queries", f"{len(df)}")
-                            elif service_name == "storage":
-                                st.metric(
-                                    "Buckets", f"{df.get('bucket_count', 0).sum()}"
-                                )
-                            elif service_name == "dataproc":
-                                st.metric("Clusters", f"{len(df)}")
-                            else:
-                                st.metric("Records", f"{len(df)}")
-
-                        # Data source indicator
-                        if has_detailed_data and detailed_cost.get("subtotal", 0) > 0:
-                            st.success("✅ Real detailed billing data")
-                        elif has_detailed_data:
-                            st.info("📊 No detailed billing costs")
-                        elif (
-                            "is_real_data" in df.columns and df["is_real_data"].iloc[0]
-                        ):
-                            st.info("📊 Historical real data")
-                        else:
-                            st.warning("📊 Sample data (no real usage)")
-
-                        # Cost trend chart
-                        if len(df) > 1:
-                            fig = px.line(
-                                df,
-                                x="date",
-                                y="cost",
-                                title=f'{service_name.replace("_", " ").title()} Cost Trend',
-                            )
-                            st.plotly_chart(fig, use_container_width=True)
-
-                        # Data table
-                        st.subheader("📋 Raw Data")
-                        st.dataframe(df, use_container_width=True)
-        else:
-            st.warning("⚠️ **No Service Data Available**")
-            st.info("💡 **To get service data:**")
-            st.markdown(
-                """
-            1. **Enable Billing Export** in Google Cloud Console
-            2. **Wait for data** to populate in the export tables
-            3. **Refresh the dashboard** to see service details
-            """
-            )
-
     def render_dashboard_builder(self):
         """Render the dynamic dashboard builder interface"""
         # Check if we're in view mode (loaded dashboard)
@@ -2114,26 +1727,8 @@ class DynamicDashboard:
             # Quick Actions
             st.subheader("⚡ Quick Actions")
 
-            # GCP Dashboard Navigation
-            col1, col2 = st.columns(2)
-            with col1:
-                if st.button("☁️ GCP Dashboard", help="Navigate to GCP Cost Dashboard"):
-                    st.session_state["gcp_dashboard_mode"] = True
-                    st.rerun()
-
-            with col2:
-                if st.button(
-                    "📊 Business Analytics",
-                    help="Navigate to Business Analytics Dashboard",
-                ):
-                    st.session_state["gcp_dashboard_mode"] = False
-                    st.rerun()
-
-            # Show current mode
-            if st.session_state.get("gcp_dashboard_mode", False):
-                st.success("☁️ GCP Dashboard Mode")
-            else:
-                st.info("📊 Business Analytics Mode")
+            # Business Analytics Dashboard
+            st.info("📊 Business Analytics Dashboard")
 
             st.divider()
 
@@ -2505,10 +2100,7 @@ class DynamicDashboard:
         # Main content area
         mode = st.session_state.get("mode_selector", "Chart Builder")
 
-        # Check if we're in GCP dashboard mode
-        if st.session_state.get("gcp_dashboard_mode", False):
-            self.render_gcp_dashboard()
-        elif mode == "Pipeline Builder":
+        if mode == "Pipeline Builder":
             self.render_pipeline_builder()
         else:
             self.render_chart_builder()
@@ -2519,6 +2111,47 @@ def main():
     st.set_page_config(
         page_title="Dynamic Dashboard Builder", page_icon="🔧", layout="wide"
     )
+
+    # Show cluster startup message immediately
+    if "cluster_startup_shown" not in st.session_state:
+        st.session_state["cluster_startup_shown"] = True
+
+        # Create a prominent startup message
+        st.markdown(
+            """
+        <div style="
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            text-align: center;
+            margin: 20px 0;
+        ">
+            <h2>🚀 Starting Databricks Cluster</h2>
+            <p style="font-size: 18px; margin: 10px 0;">
+                <strong>Please wait 3-5 minutes</strong> while we start your Databricks cluster...
+            </p>
+            <p style="font-size: 14px; opacity: 0.9;">
+                This is normal for the first time or after inactivity. The dashboard will be fully functional once the cluster is ready.
+            </p>
+            <div style="margin: 20px 0;">
+                <div class="stSpinner">
+                    <div style="display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite;"></div>
+                </div>
+            </div>
+        </div>
+        <style>
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        </style>
+        """,
+            unsafe_allow_html=True,
+        )
+
+        # Show this message for a few seconds
+        time.sleep(3)
+        st.rerun()
 
     dashboard = DynamicDashboard()
     dashboard.render_dashboard_builder()

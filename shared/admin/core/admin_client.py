@@ -9,13 +9,13 @@ from typing import Dict, List, Any, Optional
 from databricks.sdk import WorkspaceClient
 from databricks.sdk.service.compute import ClusterDetails
 from databricks.sdk.service.iam import User, Group
-from utils.logger import log_function_call
+from shared.utils.logger import log_function_call
 
-from .security_manager import SecurityManager
-from .user_manager import UserManager
-from .cluster_manager import ClusterManager
-from .workspace_manager import WorkspaceManager
-from .privilege_manager import PrivilegeManager
+from shared.admin.core.security_manager import SecurityManager
+from shared.admin.core.user_manager import UserManager
+from shared.admin.core.cluster_manager import ClusterManager
+from shared.admin.core.workspace_manager import WorkspaceManager
+from shared.admin.core.privilege_manager import PrivilegeManager
 
 
 class AdminClient:
@@ -74,7 +74,17 @@ class AdminClient:
             }
 
     def _check_admin_capabilities(self) -> bool:
-        """Check if current user has admin capabilities."""
+        """Check if current user has admin capabilities.
+        
+        Attempts to perform an admin-only operation (listing all users) to
+        determine if the current user has administrative privileges.
+        
+        Returns:
+            True if user has admin capabilities, False otherwise.
+            
+        Note:
+            This is an internal method used for capability detection.
+        """
         try:
             # Try to list all users (admin-only operation)
             self.client.users.list()
@@ -83,7 +93,17 @@ class AdminClient:
             return False
 
     def _check_user_management_capabilities(self) -> bool:
-        """Check if current user can manage users."""
+        """Check if current user can manage users.
+        
+        Attempts to list users to determine if the current user has user
+        management capabilities.
+        
+        Returns:
+            True if user can manage users, False otherwise.
+            
+        Note:
+            This is an internal method used for capability detection.
+        """
         try:
             # Try to list users
             self.client.users.list()
@@ -92,7 +112,17 @@ class AdminClient:
             return False
 
     def _check_cluster_management_capabilities(self) -> bool:
-        """Check if current user can manage clusters."""
+        """Check if current user can manage clusters.
+        
+        Attempts to list clusters to determine if the current user has cluster
+        management capabilities.
+        
+        Returns:
+            True if user can manage clusters, False otherwise.
+            
+        Note:
+            This is an internal method used for capability detection.
+        """
         try:
             # Try to list clusters
             self.client.clusters.list()
@@ -102,11 +132,26 @@ class AdminClient:
 
     @log_function_call
     def get_system_health(self) -> Dict[str, Any]:
-        """
-        Get system health information.
-
+        """Get comprehensive system health information for all components.
+        
+        Collects health metrics from all administrative components including
+        workspace, clusters, users, and security. Calculates an overall
+        health score based on individual component scores.
+        
         Returns:
-            Dictionary containing system health metrics
+            Dictionary containing health information with structure:
+            {
+                'workspace': {'health_score': float, 'status': str, ...},
+                'clusters': {'health_score': float, 'status': str, ...},
+                'users': {'health_score': float, 'status': str, ...},
+                'security': {'health_score': float, 'status': str, ...},
+                'overall': {'health_score': float, 'status': str}
+            }
+            
+        Example:
+            >>> admin = AdminClient()
+            >>> health = admin.get_system_health()
+            >>> print(f"Overall health: {health['overall']['health_score']}/100")
         """
         try:
             health_info = {
@@ -143,11 +188,20 @@ class AdminClient:
 
     @log_function_call
     def run_health_check(self) -> Dict[str, Any]:
-        """
-        Run comprehensive health check on all systems.
-
+        """Run comprehensive health check and display results.
+        
+        Performs a complete health assessment of all Databricks workspace
+        components and displays the results in a formatted output. This
+        method is useful for monitoring and troubleshooting workspace health.
+        
         Returns:
-            Dictionary containing health check results
+            Dictionary containing health check results with the same structure
+            as get_system_health().
+            
+        Example:
+            >>> admin = AdminClient()
+            >>> results = admin.run_health_check()
+            >>> # Output will be printed to console showing health scores
         """
         print("🏥 Running System Health Check")
         print("=" * 50)
@@ -174,11 +228,25 @@ class AdminClient:
 
     @log_function_call
     def get_usage_summary(self) -> Dict[str, Any]:
-        """
-        Get workspace usage summary.
-
+        """Get comprehensive workspace usage summary and statistics.
+        
+        Collects usage metrics from all workspace components including clusters,
+        users, and workspace resources. Provides insights into resource utilization
+        and workspace activity.
+        
         Returns:
-            Dictionary containing usage statistics
+            Dictionary containing usage statistics with structure:
+            {
+                'clusters': {'total': int, 'active': int, 'inactive': int, ...},
+                'users': {'total': int, 'active': int, 'inactive': int, ...},
+                'workspace': {'objects': int, 'size_mb': float, ...},
+                'timestamp': str
+            }
+            
+        Example:
+            >>> admin = AdminClient()
+            >>> usage = admin.get_usage_summary()
+            >>> print(f"Active clusters: {usage['clusters']['active']}")
         """
         try:
             # Get cluster usage
