@@ -79,9 +79,9 @@ class TestCLITools(BaseIntegrationTest):
 
         # Test with real data from DBFS
         try:
-            # Use real flight delays CSV data from DBFS
-            real_data_path = "dbfs:/databricks-datasets/flights/departuredelays.csv"
-            analyze_dataset(real_data_path, "flight_delays_sample", max_rows=1000)
+            # Use real NYC taxi compressed CSV data from DBFS
+            real_data_path = "dbfs:/databricks-datasets/nyctaxi/tripdata/yellow/yellow_tripdata_2019-01.csv.gz"
+            analyze_dataset(real_data_path, "nyc_taxi_compressed_sample", max_rows=1000)
             self.assertTrue(True)  # Test passed if no exception
         except Exception as e:
             # If we can't access real data, skip the test
@@ -93,10 +93,10 @@ class TestCLITools(BaseIntegrationTest):
 
         # Test with real data from DBFS
         try:
-            # Use real flight delays CSV data from DBFS
-            real_data_path = "dbfs:/databricks-datasets/flights/departuredelays.csv"
+            # Use real NYC taxi compressed CSV data from DBFS
+            real_data_path = "dbfs:/databricks-datasets/nyctaxi/tripdata/yellow/yellow_tripdata_2019-01.csv.gz"
             bronze_ingestion(
-                real_data_path, "flight_delays_bronze", "test_project"
+                real_data_path, "nyc_taxi_compressed_bronze", "test_project"
             )
             self.assertTrue(True)  # Test passed if no exception
         except Exception as e:
