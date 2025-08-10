@@ -88,13 +88,13 @@ class BronzeIngestion:
             DataFrame or None if failed
         """
         try:
-            # Try to load as table first
-            if not source_path.startswith("dbfs:/"):
+            # Try to load as table first (for table names)
+            if not source_path.startswith("dbfs:/") and not "/" in source_path:
                 df = self.spark.table(source_path)
                 print(f"✅ Loaded table: {source_path}")
                 return df
 
-            # Try different formats for DBFS paths
+            # Try different formats for file paths (both local and DBFS)
             formats_to_try = ["csv", "parquet", "delta", "json"]
 
             for fmt in formats_to_try:
@@ -103,10 +103,10 @@ class BronzeIngestion:
                         df = (
                             self.spark.read.format(fmt)
                             .option("header", "true")
-                            .load(source_path + "*")
+                            .load(source_path)
                         )
                     else:
-                        df = self.spark.read.format(fmt).load(source_path + "*")
+                        df = self.spark.read.format(fmt).load(source_path)
 
                     print(f"✅ Loaded as {fmt.upper()}: {source_path}")
                     return df

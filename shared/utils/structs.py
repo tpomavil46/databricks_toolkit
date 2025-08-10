@@ -6,7 +6,7 @@ from pyspark.sql.types import (
     IntegerType,
     DoubleType,
 )
-from utils.logger import log_function_call
+from shared.utils.logger import log_function_call
 
 
 @log_function_call

@@ -2,7 +2,7 @@
 
 import pyspark.sql.functions as F
 from pyspark.sql import DataFrame
-from utils.logger import log_function_call
+from shared.utils.logger import log_function_call
 
 # A simplified rules engine: known column name variants
 COLUMN_STANDARDIZATION_RULES = {
@@ -23,7 +23,7 @@ COLUMN_STANDARDIZATION_RULES = {
 # utils/schema_normalizer.py
 
 from pyspark.sql import DataFrame
-from utils.logger import log_function_call
+from shared.utils.logger import log_function_call
 
 
 @log_function_call

@@ -1,7 +1,7 @@
 # utils/config.py
 
 import os
-from utils.logger import log_function_call
+from shared.utils.logger import log_function_call
 
 
 @log_function_call

@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession
-from utils.logger import log_function_call
+from shared.utils.logger import log_function_call
 
 
 @log_function_call

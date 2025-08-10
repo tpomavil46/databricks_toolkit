@@ -1,4 +1,4 @@
-from bootstrap.dbfs_explorer import explore_dbfs_path
+from shared.bootstrap.dbfs_explorer import explore_dbfs_path
 
 
 def test_explore_dbfs_structure():

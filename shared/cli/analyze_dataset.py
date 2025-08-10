@@ -97,13 +97,13 @@ class DatasetAnalyzer:
             DataFrame or None if failed
         """
         try:
-            # Try to load as table first
-            if not dataset_path.startswith("dbfs:/"):
+            # Try to load as table first (for table names)
+            if not dataset_path.startswith("dbfs:/") and not "/" in dataset_path:
                 df = self.spark.table(dataset_path)
                 print(f"✅ Loaded table: {dataset_path}")
                 return df
 
-            # Try different formats for DBFS paths
+            # Try different formats for file paths (both local and DBFS)
             formats_to_try = ["csv", "parquet", "delta", "json"]
 
             for fmt in formats_to_try:
@@ -112,10 +112,10 @@ class DatasetAnalyzer:
                         df = (
                             self.spark.read.format(fmt)
                             .option("header", "true")
-                            .load(dataset_path + "*")
+                            .load(dataset_path)
                         )
                     else:
-                        df = self.spark.read.format(fmt).load(dataset_path + "*")
+                        df = self.spark.read.format(fmt).load(dataset_path)
 
                     print(f"✅ Loaded as {fmt.upper()}: {dataset_path}")
                     return df

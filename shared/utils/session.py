@@ -1,7 +1,7 @@
 # utils/session.py
 
 from databricks.connect import DatabricksSession  # noqa: F811
-from utils.logger import log_function_call
+from shared.utils.logger import log_function_call
 
 
 class MyDatabricksSession:
@@ -13,7 +13,7 @@ class MyDatabricksSession:
         """
         spark = (
             DatabricksSession.builder.profile("databricks")
-            .clusterId("0401-190124-nho4m8l8")
+            .clusterId("5802-005055-h7vtizbe")
             .getOrCreate()
         )
 

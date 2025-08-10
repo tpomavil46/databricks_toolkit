@@ -32,9 +32,15 @@ def run_sql_pipeline(project_name: str, environment: str = "dev"):
     print(f"📋 Environment: {environment}")
 
     try:
+        # Import here to avoid circular imports
+        from databricks.connect import DatabricksSession
+
+        # Create Spark session
+        spark = DatabricksSession.builder.profile("databricks").getOrCreate()
+
         # Initialize the SQL-driven pipeline
         pipeline = SQLDrivenPipeline(
-            spark=None,  # Will be initialized by the pipeline
+            spark=spark,
             sql_base_path="workflows/sql_driven/sql",
             project=project_name,
         )

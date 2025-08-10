@@ -1,8 +1,8 @@
 # tests/test_ingest.py
 
-from jobs.bronze.ingest import ingest_data
-from utils.session import MyDatabricksSession
-from utils.structs import get_column_mapping
+from config.jobs.bronze.ingest import ingest_data
+from shared.utils.session import MyDatabricksSession
+from shared.utils.structs import get_column_mapping
 
 
 def test_ingest_nytaxi_data():

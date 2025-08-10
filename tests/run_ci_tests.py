@@ -112,7 +112,7 @@ def run_ci_tests():
             def test_utils_logger(self):
                 """Test logger utility functionality."""
                 try:
-                    from utils.logger import log_function_call
+                    from shared.utils.logger import log_function_call
 
                     @log_function_call
                     def test_function():
@@ -126,7 +126,7 @@ def run_ci_tests():
             def test_utils_schema_normalizer(self):
                 """Test schema normalizer functionality."""
                 try:
-                    from utils.schema_normalizer import auto_normalize_columns
+                    from shared.utils.schema_normalizer import auto_normalize_columns
                     from pyspark.sql import SparkSession
                     from pyspark.sql.types import StructType, StructField, StringType
 

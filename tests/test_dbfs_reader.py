@@ -1,7 +1,7 @@
 # tests/test_dbfs_reader.py
 
-from bootstrap.dbfs_reader import preview_dbfs_file
-from utils.session import MyDatabricksSession
+from shared.bootstrap.dbfs_reader import preview_dbfs_file
+from shared.utils.session import MyDatabricksSession
 
 
 def test_preview_dbfs_file():

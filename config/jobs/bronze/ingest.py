@@ -2,9 +2,9 @@
 
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql import functions as F
-from utils.io import write_df_as_table_or_path
-from utils.logger import log_function_call
-from utils.schema_normalizer import auto_normalize_columns
+from shared.utils.io import write_df_as_table_or_path
+from shared.utils.logger import log_function_call
+from shared.utils.schema_normalizer import auto_normalize_columns
 
 
 @log_function_call
