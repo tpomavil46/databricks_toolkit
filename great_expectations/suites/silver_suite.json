@@ -1,0 +1,84 @@
+{
+  "expectation_suite_name": "silver_dq_suite",
+  "meta": {
+    "layer": "silver",
+    "description": "DQ expectations for Silver (cleansed, conformed) tables. Silver enforces business rules that Bronze does not. Thresholds use mostly=0.99 as a starting point — tune to your domain's actual null rates after profiling.",
+    "when_to_run": "After Silver write (post-transformation, pre-Gold promotion). Block Gold load if suite fails."
+  },
+  "expectations": [
+    {
+      "expectation_type": "expect_table_row_count_to_be_between",
+      "kwargs": {
+        "min_value": 1,
+        "max_value": null
+      },
+      "meta": { "notes": "Silver table must have at least one row. Tune max_value to alert on volume spikes." }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "business_key",
+        "mostly": 1.0
+      },
+      "meta": {
+        "notes": "Replace 'business_key' with your actual primary key column. Silver must have no null business keys — quarantine or drop nulls in transformation."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_unique",
+      "kwargs": {
+        "column": "business_key"
+      },
+      "meta": {
+        "notes": "Silver business key must be unique. If this is a slowly-changing table, scope uniqueness to (business_key, valid_from) instead."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "updated_at",
+        "mostly": 1.0
+      },
+      "meta": { "notes": "All Silver rows must have a modification timestamp for SCD and audit purposes." }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {
+        "column": "updated_at",
+        "min_value": "2000-01-01T00:00:00",
+        "max_value": null,
+        "parse_strings_as_datetimes": true
+      },
+      "meta": { "notes": "Reject timestamps before year 2000 — likely epoch-zero or default values from upstream." }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_set",
+      "kwargs": {
+        "column": "record_status",
+        "value_set": ["active", "inactive", "deleted"]
+      },
+      "meta": {
+        "notes": "Accepted status values — expand for your domain. This blocks unknown status codes from reaching Gold."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "record_status",
+        "mostly": 1.0
+      },
+      "meta": { "notes": "Status must always be populated after Silver transformation." }
+    },
+    {
+      "expectation_type": "expect_column_values_to_match_regex",
+      "kwargs": {
+        "column": "email",
+        "regex": ".+@.+\\..+",
+        "mostly": 0.99
+      },
+      "meta": {
+        "notes": "Email format validation. mostly=0.99 allows 1% slack for legacy records. Tighten to 1.0 once backfill is clean."
+      }
+    }
+  ]
+}

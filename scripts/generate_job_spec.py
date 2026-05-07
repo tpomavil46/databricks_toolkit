@@ -10,7 +10,7 @@ BASE_JOB_SPEC = {
         {
             "task_key": None,
             "existing_cluster_id": os.environ.get(
-                "DATABRICKS_CLUSTER_ID", "0723-232148-jfym366q"
+                "DATABRICKS_CLUSTER_ID", "5409-211715-ajg8nyve"
             ),
             "spark_python_task": {"python_file": None},
         }
@@ -48,7 +48,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--email",
         required=False,
-        default="tpomavil@icloud.com",
+        default="timothypomaville@gmail.com",
         help="Your Databricks email for the Repo path",
     )
 

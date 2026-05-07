@@ -1,0 +1,51 @@
+{
+  "data_asset_type": null,
+  "expectation_suite_name": "scd_type2_suite",
+  "meta": {
+    "great_expectations_version": "0.18.x",
+    "notes": "Stub suite for SCD Type 2 dim tables. Tune result_format and mostly thresholds before running in production."
+  },
+  "expectations": [
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": { "column": "scd_key" },
+      "meta": { "notes": "Every row must have a surrogate key" }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": { "column": "effective_start" },
+      "meta": { "notes": "All rows must have an effective start date" }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": { "column": "is_current" },
+      "meta": { "notes": "is_current must always be set (never NULL)" }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_set",
+      "kwargs": { "column": "is_current", "value_set": [true, false] },
+      "meta": { "notes": "is_current must be a boolean" }
+    },
+    {
+      "expectation_type": "expect_column_pair_values_A_to_be_greater_than_B",
+      "kwargs": {
+        "column_A": "effective_end",
+        "column_B": "effective_start",
+        "or_equal": false,
+        "ignore_row_if": "either_value_is_missing"
+      },
+      "meta": { "notes": "effective_end must be after effective_start when set" }
+    },
+    {
+      "expectation_type": "expect_column_proportion_of_unique_values_to_be_between",
+      "kwargs": { "column": "scd_key", "min_value": 1.0, "max_value": 1.0 },
+      "meta": { "notes": "scd_key must be unique across all rows (each version has a distinct key)" }
+    },
+    {
+      "expectation_type": "expect_column_values_to_match_regex",
+      "kwargs": { "column": "scd_key", "regex": "^[0-9a-f]{64}$" },
+      "meta": { "notes": "scd_key must be a 64-char hex string (SHA-256)" }
+    }
+  ],
+  "ge_cloud_id": null
+}

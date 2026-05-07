@@ -1,0 +1,68 @@
+{
+  "expectation_suite_name": "bronze_dq_suite",
+  "meta": {
+    "layer": "bronze",
+    "description": "Minimum DQ expectations for Bronze (raw ingest) tables. Thresholds are intentionally permissive — Bronze accepts raw data as-is. Tune mostly_values after profiling real data volumes.",
+    "when_to_run": "After each AutoLoader / streaming write batch, before Silver promotion."
+  },
+  "expectations": [
+    {
+      "expectation_type": "expect_table_row_count_to_be_between",
+      "kwargs": {
+        "min_value": 1,
+        "max_value": null
+      },
+      "meta": {
+        "notes": "Fail if batch is empty — indicates upstream source issue or misconfigured AutoLoader path."
+      }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": { "column": "_ingest_ts" },
+      "meta": {
+        "notes": "Every Bronze row must carry an ingestion timestamp for lineage and freshness checks."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "_ingest_ts",
+        "mostly": 1.0
+      },
+      "meta": { "notes": "Ingestion timestamp must always be populated." }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": { "column": "_source_file" },
+      "meta": {
+        "notes": "Source file path — populated by AutoLoader cloudFiles reader. Adjust column name if using a different ingest method."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "_source_file",
+        "mostly": 1.0
+      },
+      "meta": { "notes": "Every row should trace back to a source file." }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "_ingest_ts",
+        "type_": "TimestampType"
+      },
+      "meta": { "notes": "Ingest timestamp must be a proper Spark TimestampType, not a string." }
+    },
+    {
+      "expectation_type": "expect_table_columns_to_match_ordered_list",
+      "kwargs": {
+        "column_list": ["_ingest_ts", "_source_file"],
+        "exact_match": false
+      },
+      "meta": {
+        "notes": "Metadata columns must be present. Payload columns vary by source — set exact_match=false."
+      }
+    }
+  ]
+}

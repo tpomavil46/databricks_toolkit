@@ -1,0 +1,41 @@
+{
+  "data_asset_type": null,
+  "expectation_suite_name": "scd_type4_suite",
+  "meta": {
+    "great_expectations_version": "0.18.x",
+    "notes": "Stub suite for SCD Type 4 history tables. Run against the history table, not the current table. Tune thresholds before production."
+  },
+  "expectations": [
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": { "column": "scd_key" },
+      "meta": { "notes": "Every history row needs a surrogate key" }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": { "column": "changed_at" },
+      "meta": { "notes": "All history rows must record when the change occurred" }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": { "column": "change_type" },
+      "meta": { "notes": "change_type (INSERT or UPDATE) must always be set" }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_set",
+      "kwargs": { "column": "change_type", "value_set": ["INSERT", "UPDATE"] },
+      "meta": { "notes": "Only INSERT and UPDATE are valid change types in this table" }
+    },
+    {
+      "expectation_type": "expect_column_proportion_of_unique_values_to_be_between",
+      "kwargs": { "column": "scd_key", "min_value": 1.0, "max_value": 1.0 },
+      "meta": { "notes": "scd_key must be unique (each history entry is its own row)" }
+    },
+    {
+      "expectation_type": "expect_table_row_count_to_be_between",
+      "kwargs": { "min_value": 0, "max_value": null },
+      "meta": { "notes": "Tune max_value based on expected maximum history depth per entity" }
+    }
+  ],
+  "ge_cloud_id": null
+}

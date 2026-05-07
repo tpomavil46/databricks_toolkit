@@ -1,0 +1,36 @@
+{
+  "data_asset_type": null,
+  "expectation_suite_name": "upserts_suite",
+  "meta": {
+    "great_expectations_version": "0.18.x",
+    "notes": "Stub suite for tables managed by upsert/MERGE pipelines. Run after each MERGE batch. Tune thresholds before production."
+  },
+  "expectations": [
+    {
+      "expectation_type": "expect_table_row_count_to_be_between",
+      "kwargs": { "min_value": 0, "max_value": null },
+      "meta": { "notes": "Set max_value to expected upper bound for your dimension" }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": { "column": "REPLACE_WITH_MERGE_KEY" },
+      "meta": { "notes": "Merge keys must never be null" }
+    },
+    {
+      "expectation_type": "expect_column_proportion_of_unique_values_to_be_between",
+      "kwargs": { "column": "REPLACE_WITH_MERGE_KEY", "min_value": 1.0, "max_value": 1.0 },
+      "meta": { "notes": "Merge key must be unique in the target after upsert (1-to-1 per entity)" }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": { "column": "_content_hash", "mostly": 1.0 },
+      "meta": { "notes": "Remove or rename if content hash tracking is not enabled (idempotent pattern)" }
+    },
+    {
+      "expectation_type": "expect_column_values_to_match_regex",
+      "kwargs": { "column": "_content_hash", "regex": "^[0-9a-f]{64}$" },
+      "meta": { "notes": "Content hash should be a 64-char hex string. Remove if not using idempotent pattern." }
+    }
+  ],
+  "ge_cloud_id": null
+}

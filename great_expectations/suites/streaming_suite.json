@@ -1,0 +1,77 @@
+{
+  "data_asset_type": null,
+  "expectation_suite_name": "streaming_silver_suite",
+  "expectations": [
+    {
+      "expectation_type": "expect_table_row_count_to_be_between",
+      "kwargs": {
+        "min_value": 1,
+        "max_value": null
+      },
+      "meta": {
+        "notes": "Silver table should never be empty after a streaming run."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "REPLACE_WITH_MERGE_KEY_COLUMN"
+      },
+      "meta": {
+        "notes": "Merge key must never be null — streaming dedup relies on it."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_unique",
+      "kwargs": {
+        "column": "REPLACE_WITH_MERGE_KEY_COLUMN"
+      },
+      "meta": {
+        "notes": "After foreachBatch MERGE, each merge key appears exactly once."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "REPLACE_WITH_EVENT_TIMESTAMP_COLUMN"
+      },
+      "meta": {
+        "notes": "Event timestamp must be present — required for watermark and late-arrival guard."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {
+        "column": "REPLACE_WITH_EVENT_TIMESTAMP_COLUMN",
+        "min_value": "REPLACE_WITH_PIPELINE_START_DATE",
+        "max_value": null
+      },
+      "meta": {
+        "notes": "Timestamps should not precede the pipeline start date (guards against epoch-zero defaults)."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "_content_hash"
+      },
+      "meta": {
+        "notes": "Content hash must be set — idempotent foreachBatch MERGE requires it. Remove if not using hash guard."
+      }
+    },
+    {
+      "expectation_type": "expect_column_value_lengths_to_equal",
+      "kwargs": {
+        "column": "_content_hash",
+        "value": 64
+      },
+      "meta": {
+        "notes": "SHA-256 hash is always 64 hex characters."
+      }
+    }
+  ],
+  "meta": {
+    "great_expectations_version": "0.18.x",
+    "notes": "Streaming Silver table quality suite. Replace REPLACE_WITH_* placeholders before use."
+  }
+}

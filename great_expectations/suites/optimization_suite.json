@@ -1,0 +1,71 @@
+{
+  "expectation_suite_name": "optimization_health_suite",
+  "meta": {
+    "description": "Table health expectations to validate that optimization has been applied. Run after OPTIMIZE / Liquid Clustering / bloom filter creation to verify the table is in a healthy state for query performance.",
+    "when_to_run": "After OPTIMIZE completes. Alert if avg_file_size_mb < 64 (small file problem persists) or num_files has grown beyond threshold."
+  },
+  "expectations": [
+    {
+      "expectation_type": "expect_table_row_count_to_be_between",
+      "kwargs": {
+        "min_value": 1,
+        "max_value": null
+      },
+      "meta": {
+        "notes": "OPTIMIZE must not produce an empty table. Failure here indicates a corrupt or empty source."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "partition_col",
+        "mostly": 1.0
+      },
+      "meta": {
+        "notes": "Replace 'partition_col' with your actual partition column. NULL partition values cause data to land in the __HIVE_DEFAULT_PARTITION__ partition — a common source of small files and query plan issues."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {
+        "column": "avg_file_size_mb",
+        "min_value": 64,
+        "max_value": 1024
+      },
+      "meta": {
+        "notes": "Run DESCRIBE DETAIL and compute avg_file_size_mb = sizeInBytes / 1024 / 1024 / numFiles. Values < 64 MB indicate small file problem; > 1024 MB may cause task OOM. Adjust bounds for your workload."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {
+        "column": "num_files",
+        "min_value": 1,
+        "max_value": 50000
+      },
+      "meta": {
+        "notes": "Tables with > 50K files suffer from slow file listing. If breached, switch to Liquid Clustering or increase OPTIMIZE frequency."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "bloom_filter_col",
+        "mostly": 0.99
+      },
+      "meta": {
+        "notes": "Replace 'bloom_filter_col' with the column you created a bloom filter on (e.g., user_id). Bloom filters do not help NULL values — if NULLs are frequent, fix upstream data quality."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "clustering_col",
+        "mostly": 1.0
+      },
+      "meta": {
+        "notes": "Replace 'clustering_col' with your CLUSTER BY or ZORDER BY column. NULL clustering keys are stored in separate files and cannot be skipped by data-skipping stats."
+      }
+    }
+  ]
+}

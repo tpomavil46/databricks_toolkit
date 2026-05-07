@@ -1,0 +1,68 @@
+{
+  "data_asset_type": null,
+  "expectation_suite_name": "delta_features_suite",
+  "expectations": [
+    {
+      "expectation_type": "expect_table_row_count_to_be_between",
+      "kwargs": {
+        "min_value": 1,
+        "max_value": null
+      },
+      "meta": {
+        "notes": "After time travel read, table should have data. Tune min_value to your expected snapshot size."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "_change_type"
+      },
+      "meta": {
+        "notes": "CDF output: _change_type must always be set. If this fails, the CDF read returned non-CDF rows."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_set",
+      "kwargs": {
+        "column": "_change_type",
+        "value_set": ["insert", "update_preimage", "update_postimage", "delete"]
+      },
+      "meta": {
+        "notes": "CDF _change_type must be one of the four valid values."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "_commit_version"
+      },
+      "meta": {
+        "notes": "CDF: commit version must always be present."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {
+        "column": "_commit_version",
+        "min_value": 0,
+        "max_value": null
+      },
+      "meta": {
+        "notes": "CDF: commit version must be non-negative."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "_commit_timestamp"
+      },
+      "meta": {
+        "notes": "CDF: commit timestamp must always be present."
+      }
+    }
+  ],
+  "meta": {
+    "great_expectations_version": "0.18.x",
+    "notes": "Validates CDF output from a Delta table. Apply to table_changes() or readChangeFeed results."
+  }
+}

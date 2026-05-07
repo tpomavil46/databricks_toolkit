@@ -1,0 +1,88 @@
+{
+  "expectation_suite_name": "gold_dq_suite",
+  "meta": {
+    "layer": "gold",
+    "description": "DQ expectations for Gold (business-facing, aggregated/dimensional) tables. Gold has the strictest expectations — it backs dashboards and downstream ML. Zero tolerance for nulls on key metrics. Tune row count bounds after observing 30 days of production data.",
+    "when_to_run": "After Gold write. Alert on-call if suite fails — Gold failures directly affect business reporting."
+  },
+  "expectations": [
+    {
+      "expectation_type": "expect_table_row_count_to_be_between",
+      "kwargs": {
+        "min_value": 100,
+        "max_value": null
+      },
+      "meta": {
+        "notes": "Gold tables are aggregates — fewer than 100 rows likely indicates a broken join or filter. Tune min_value to typical daily row count * 0.8."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "dimension_key",
+        "mostly": 1.0
+      },
+      "meta": {
+        "notes": "Replace 'dimension_key' with your primary key. Gold must have zero null keys — no exceptions."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_unique",
+      "kwargs": {
+        "column": "dimension_key"
+      },
+      "meta": { "notes": "Gold dimension keys must be unique. Fact tables: scope uniqueness to composite grain." }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "metric_value",
+        "mostly": 1.0
+      },
+      "meta": {
+        "notes": "Replace 'metric_value' with your primary KPI column. Null metrics break dashboard aggregations and ML feature pipelines."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {
+        "column": "metric_value",
+        "min_value": 0,
+        "max_value": null
+      },
+      "meta": {
+        "notes": "Metrics should never be negative unless your domain explicitly allows it (e.g. returns/credits). Set max_value to 3x typical peak."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "report_date",
+        "mostly": 1.0
+      },
+      "meta": { "notes": "Every Gold row must be anchored to a reporting date for time-series dashboards." }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {
+        "column": "report_date",
+        "min_value": "2020-01-01",
+        "max_value": null,
+        "parse_strings_as_datetimes": true
+      },
+      "meta": { "notes": "Report dates before 2020 are almost always pipeline bugs — adjust to your data history start date." }
+    },
+    {
+      "expectation_type": "expect_column_pair_values_A_to_be_greater_than_B",
+      "kwargs": {
+        "column_A": "total_revenue",
+        "column_B": "refund_amount",
+        "or_equal": true,
+        "ignore_row_if": "either_value_is_missing"
+      },
+      "meta": {
+        "notes": "Domain invariant: refunds cannot exceed revenue. Replace with your own business rule pair. Remove if not applicable."
+      }
+    }
+  ]
+}

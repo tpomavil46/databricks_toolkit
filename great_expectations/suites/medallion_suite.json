@@ -1,0 +1,92 @@
+{
+  "expectation_suite_name": "medallion_pipeline_suite",
+  "meta": {
+    "description": "Cross-layer medallion pipeline expectations. Validate that each layer contract is upheld after a pipeline run. Run against all three tables after a full Bronze→Silver→Gold cycle.",
+    "when_to_run": "After each complete pipeline run (all three layers). Fail the pipeline trigger if any expectation fails."
+  },
+  "expectations": [
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": { "column": "_ingest_ts" },
+      "meta": {
+        "layer": "bronze",
+        "notes": "Bronze metadata column — must exist. Absence means add_bronze_metadata() was not called."
+      }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": { "column": "_source_file" },
+      "meta": {
+        "layer": "bronze",
+        "notes": "Source file provenance — required for Bronze lineage audit."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": { "column": "_ingest_ts", "mostly": 1.0 },
+      "meta": { "layer": "bronze" }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": { "column": "_batch_id", "mostly": 1.0 },
+      "meta": { "layer": "bronze", "notes": "Batch ID must always be populated (0 for non-streaming)." }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": { "column": "business_key" },
+      "meta": {
+        "layer": "silver",
+        "notes": "Replace 'business_key' with your actual id_col. Silver must have a business key."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_unique",
+      "kwargs": { "column": "business_key" },
+      "meta": {
+        "layer": "silver",
+        "notes": "Silver deduplication must produce exactly one row per business_key. Failure indicates deduplicate_silver() was not applied."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": { "column": "business_key", "mostly": 1.0 },
+      "meta": { "layer": "silver" }
+    },
+    {
+      "expectation_type": "expect_table_row_count_to_be_between",
+      "kwargs": { "min_value": 1, "max_value": null },
+      "meta": {
+        "layer": "silver",
+        "notes": "Silver must not be empty after a Bronze batch. Empty Silver means all records were quarantined or transform_fn dropped everything."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": { "column": "report_date", "mostly": 1.0 },
+      "meta": {
+        "layer": "gold",
+        "notes": "Replace 'report_date' with your Gold partition column. All Gold rows must have a reporting date."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": { "column": "metric_value", "mostly": 1.0 },
+      "meta": {
+        "layer": "gold",
+        "notes": "Replace 'metric_value' with your primary KPI column. Null Gold metrics break dashboards."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {
+        "column": "metric_value",
+        "min_value": 0,
+        "max_value": null
+      },
+      "meta": {
+        "layer": "gold",
+        "notes": "KPI values must be non-negative. Adjust or remove if your domain has negative metrics (e.g., returns)."
+      }
+    }
+  ]
+}
