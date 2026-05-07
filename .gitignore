@@ -44,6 +44,9 @@ spark-warehouse/
 .DS_Store
 Thumbs.db
 
+# Type checking cache
+.mypy_cache/
+
 # Test cache
 .pytest_cache/
 coverage.xml
